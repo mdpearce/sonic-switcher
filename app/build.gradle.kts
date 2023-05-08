@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -52,7 +53,8 @@ android {
 }
 
 dependencies {
-
+    ksp(libs.kotlin.inject.compiler.ksp)
+    implementation(libs.kotlin.inject.runtime)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
