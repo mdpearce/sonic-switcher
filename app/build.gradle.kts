@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.neaniesoft.sonicswitcher"
-    compileSdk = 33
+    compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.neaniesoft.sonicswitcher"
-        minSdk = 28
-        targetSdk = 33
+        minSdk = libs.versions.min.sdk.get().toInt()
+        targetSdk = libs.versions.target.sdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -36,7 +36,7 @@ android {
         targetCompatibility(JavaVersion.VERSION_1_8)
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = libs.versions.kotlin.jvm.target.get()
     }
     @Suppress("UnstableApiUsage")
     buildFeatures {

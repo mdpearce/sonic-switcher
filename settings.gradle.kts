@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Sonic Switcher"
 include(":app")
+include(":converter")
