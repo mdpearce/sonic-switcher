@@ -4,7 +4,7 @@ kotlin = "1.8.21"
 compose-compiler = "1.4.7"
 kotlin-inject = "0.6.1"
 compile-sdk = "33"
-min-sdk = "28"
+min-sdk = "29"
 target-sdk = "33"
 kotlin-jvm-target = "1.8"
 
@@ -25,3 +25,4 @@ androidx-test-ext-junit = { module = "androidx.test.ext:junit", version = "1.1.5
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.5.1" }
 kotlin-inject-compiler-ksp = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlin-inject" }
 kotlin-inject-runtime = { module = "me.tatarka.inject:kotlin-inject-runtime", version.ref = "kotlin-inject" }
+kotlin-result = { module = "com.michael-bull.kotlin-result:kotlin-result", version = "1.1.17" }
