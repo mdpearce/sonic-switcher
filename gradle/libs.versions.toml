@@ -6,7 +6,7 @@ kotlin-inject = "0.6.1"
 compile-sdk = "33"
 min-sdk = "29"
 target-sdk = "33"
-kotlin-jvm-target = "1.8"
+kotlin-jvm-target = "17"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
