@@ -7,6 +7,7 @@ compile-sdk = "33"
 min-sdk = "29"
 target-sdk = "33"
 kotlin-jvm-target = "17"
+lifecycle = "2.6.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
@@ -17,7 +18,9 @@ ksp = { id = "com.google.devtools.ksp", version = "1.8.21-1.0.11" }
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.10.0" }
-androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.6.1" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.7.1" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2023.05.00" }
 junit = { module = "junit:junit", version = "4.13.2" }
@@ -26,3 +29,4 @@ androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core",
 kotlin-inject-compiler-ksp = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlin-inject" }
 kotlin-inject-runtime = { module = "me.tatarka.inject:kotlin-inject-runtime", version.ref = "kotlin-inject" }
 kotlin-result = { module = "com.michael-bull.kotlin-result:kotlin-result", version = "1.1.17" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }

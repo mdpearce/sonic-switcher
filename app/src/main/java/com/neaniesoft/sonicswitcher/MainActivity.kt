@@ -10,12 +10,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.neaniesoft.sonicswitcher.screens.MainScreen
+import com.neaniesoft.sonicswitcher.di.ApplicationComponent
+import com.neaniesoft.sonicswitcher.di.create
 import com.neaniesoft.sonicswitcher.ui.theme.SonicSwitcherTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val mainScreen = ApplicationComponent::class.create().mainScreen
+
         setContent {
             SonicSwitcherTheme {
                 // A surface container using the 'background' color from the theme
@@ -23,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    mainScreen()
                 }
             }
         }
