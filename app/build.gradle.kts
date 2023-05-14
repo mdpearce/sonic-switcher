@@ -1,7 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -52,11 +53,15 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
     implementation(project(":converter"))
 
-    ksp(libs.kotlin.inject.compiler.ksp)
-    implementation(libs.kotlin.inject.runtime)
+    kapt(libs.dagger.hilt.compiler)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.kotlin.result)
     implementation(libs.kotlin.reflect)
     implementation(libs.androidx.core.ktx)

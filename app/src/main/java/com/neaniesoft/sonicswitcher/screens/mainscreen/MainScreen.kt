@@ -8,28 +8,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.neaniesoft.sonicswitcher.ui.utils.viewModel
-import me.tatarka.inject.annotations.Inject
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-typealias MainScreen = @Composable () -> Unit
-
-@Inject
 @Composable
-fun MainScreen(mainScreenViewModel: () -> MainScreenViewModel) {
-    val viewModel = viewModel { mainScreenViewModel() }
+fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Button(onClick = { }, modifier = Modifier.align(Alignment.BottomCenter)) {
+        Button(
+            onClick = { viewModel.onConvertClicked() },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
             Text(text = "Convert")
         }
     }
 }
 
-@Preview
-@Composable
-fun PreviewMainScreen() = MainScreen() { MainScreenViewModel() }
+// @Preview
+// @Composable
+// fun PreviewMainScreen() = MainScreen() { MainScreenViewModel() }

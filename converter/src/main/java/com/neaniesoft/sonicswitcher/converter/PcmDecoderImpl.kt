@@ -8,7 +8,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.mapError
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileOutputStream
 
 class PcmDecoderImpl(
@@ -20,12 +19,12 @@ class PcmDecoderImpl(
     }
 
     override fun decodeToPcm(
-        inputFile: FileDescriptor,
+        inputFile: File,
         outputPath: String
     ): Result<File, ConverterError> {
         val mediaExtractor = mediaExtractorFactory()
 
-        mediaExtractor.setDataSource(inputFile)
+        mediaExtractor.setDataSource(inputFile.absolutePath)
 
         val track = (0..mediaExtractor.trackCount).map { index ->
             TrackWithFormat(index, mediaExtractor.getTrackFormat(index))

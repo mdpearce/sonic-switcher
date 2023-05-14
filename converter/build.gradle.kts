@@ -1,7 +1,8 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -35,8 +36,8 @@ android {
 }
 
 dependencies {
-    ksp(libs.kotlin.inject.compiler.ksp)
-    implementation(libs.kotlin.inject.runtime)
+    kapt(libs.dagger.hilt.compiler)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
     api(libs.kotlin.result)
     testImplementation(libs.junit)
