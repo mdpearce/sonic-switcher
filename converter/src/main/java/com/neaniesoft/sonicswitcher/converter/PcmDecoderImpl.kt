@@ -1,17 +1,20 @@
 package com.neaniesoft.sonicswitcher.converter
 
+import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.net.Uri
 import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.mapError
 import java.io.File
 import java.io.FileOutputStream
 
 class PcmDecoderImpl(
-    private val mediaExtractorFactory: () -> MediaExtractor
+    private val mediaExtractorFactory: () -> MediaExtractor,
+    private val context: Context
 ) : PcmDecoder {
 
     companion object {
@@ -19,14 +22,14 @@ class PcmDecoderImpl(
     }
 
     override fun decodeToPcm(
-        inputFile: File,
+        input: Uri,
         outputPath: String
     ): Result<File, ConverterError> {
         val mediaExtractor = mediaExtractorFactory()
 
-        mediaExtractor.setDataSource(inputFile.absolutePath)
+        mediaExtractor.setDataSource(context, input, null)
 
-        val track = (0..mediaExtractor.trackCount).map { index ->
+        val track = (0 until mediaExtractor.trackCount).map { index ->
             TrackWithFormat(index, mediaExtractor.getTrackFormat(index))
         }.firstOrNull { track ->
             track.format.getString(MediaFormat.KEY_MIME, "").startsWith("audio/")
@@ -107,9 +110,7 @@ class PcmDecoderImpl(
         codec.stop()
         codec.release()
 
-        return com.github.michaelbull.result.runCatching {
-            outputFile
-        }.mapError { OutputFileError(it) }
+        return Ok(outputFile)
     }
 }
 

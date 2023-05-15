@@ -1,9 +1,11 @@
 package com.neaniesoft.sonicswitcher.converter
 
+import android.content.Context
 import android.media.MediaExtractor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -15,6 +17,6 @@ class ConverterModule {
     fun provideMediaExtractorFactory(): () -> MediaExtractor = { MediaExtractor() }
 
     @Provides
-    fun providePcmDecoder(mediaExtractorFactory: () -> MediaExtractor): PcmDecoder =
-        PcmDecoderImpl(mediaExtractorFactory)
+    fun providePcmDecoder(mediaExtractorFactory: () -> MediaExtractor, @ApplicationContext context: Context): PcmDecoder =
+        PcmDecoderImpl(mediaExtractorFactory, context)
 }

@@ -1,6 +1,5 @@
 package com.neaniesoft.sonicswitcher.screens.mainscreen
 
-import android.content.ContentResolver
 import android.net.Uri
 import android.os.Environment
 import androidx.lifecycle.ViewModel
@@ -14,13 +13,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val pcmDecoder: PcmDecoder,
-    private val contentResolver: ContentResolver
+    private val pcmDecoder: PcmDecoder
 ) : ViewModel() {
 
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
@@ -29,11 +26,20 @@ class MainScreenViewModel @Inject constructor(
     private val _inputFileDetails: MutableStateFlow<String> = MutableStateFlow("")
     val inputFileDetails: StateFlow<String> = _inputFileDetails.asStateFlow()
 
+    private var inputFile: Uri? = null
+        set(value) {
+            field = value
+            _inputFileDetails.value = value.toString()
+        }
+
     fun onConvertClicked() {
-        pcmDecoder.decodeToPcm(
-            File(Environment.getExternalStorageDirectory().path + "/sample.m4a"),
-            Environment.getExternalStorageDirectory().path + "output.pcm"
-        )
+        val uri = inputFile
+        if (uri != null) {
+            pcmDecoder.decodeToPcm(
+                uri,
+                Environment.getExternalStorageDirectory().path + "output.pcm"
+            )
+        }
     }
 
     fun onOpenFileChooserClicked() {
@@ -41,11 +47,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun onInputFileChosen(uri: Uri?) {
-        if (uri != null) {
-            viewModelScope.launch {
-                _inputFileDetails.value = uri.toString()
-            }
-        }
+        inputFile = uri
     }
 }
 
