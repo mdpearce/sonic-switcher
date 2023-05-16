@@ -1,6 +1,7 @@
 package com.neaniesoft.sonicswitcher.screens.mainscreen
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,14 +26,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
-    val inputFileDetails by viewModel.inputFileDetails.collectAsState()
+    val inputFileUri by viewModel.inputFile.collectAsState()
+    val isConverting by viewModel.isConverting.collectAsState()
+
     val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             viewModel.onInputFileChosen(result.data?.data)
         }
     val outputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-            viewModel.onOutputPathChosen(result.data?.data)
+            viewModel.onOutputPathChosen(inputFileUri, result.data?.data ?: Uri.EMPTY)
         }
 
     LaunchedEffect(viewModel.uiEvents) {
@@ -59,8 +63,9 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
 
     MainScreenContent(
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
-        onConvertClicked = viewModel::onConvertClicked,
-        inputFileDetails = inputFileDetails
+        onConvertClicked = { viewModel.onConvertClicked(inputFileUri) },
+        inputFileDetails = inputFileUri.toString(),
+        isConverting = isConverting
     )
 }
 
@@ -68,14 +73,19 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
 fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
     onConvertClicked: () -> Unit,
-    inputFileDetails: String
+    inputFileDetails: String,
+    isConverting: Boolean
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = inputFileDetails, modifier = Modifier.align(Alignment.Center))
+        if (isConverting) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        } else {
+            Text(text = inputFileDetails, modifier = Modifier.align(Alignment.Center))
+        }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
@@ -97,4 +107,4 @@ fun MainScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, "input file details")
+fun PreviewMainScreen() = MainScreenContent({}, {}, "input file details", false)

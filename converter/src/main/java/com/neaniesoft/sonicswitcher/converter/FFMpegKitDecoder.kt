@@ -15,7 +15,7 @@ class FFMpegKitDecoder(private val context: Context) : AudioFileConverter {
         private const val TAG = "FFMpegKitDecoder"
     }
 
-    override suspend fun decodeToPcm(input: Uri, output: Uri): Result<Boolean, ConverterError> {
+    override suspend fun convertAudioFile(input: Uri, output: Uri): Result<Boolean, ConverterError> {
         val inputPath = FFmpegKitConfig.getSafParameterForRead(context, input)
         val outputPath = FFmpegKitConfig.getSafParameterForWrite(context, output)
 

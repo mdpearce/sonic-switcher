@@ -18,23 +18,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val pcmDecoder: AudioFileConverter
+    private val audioFileConverter: AudioFileConverter
 ) : ViewModel() {
 
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
     val uiEvents: SharedFlow<UiEvents> = _uiEvents.asSharedFlow()
 
-    private val _inputFileDetails: MutableStateFlow<String> = MutableStateFlow("")
-    val inputFileDetails: StateFlow<String> = _inputFileDetails.asStateFlow()
+    private val _inputFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
+    val inputFile: StateFlow<Uri> = _inputFile.asStateFlow()
 
-    private var inputFile: Uri? = null
-        set(value) {
-            field = value
-            _inputFileDetails.value = value.toString()
-        }
+    private val _isConverting: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isConverting: StateFlow<Boolean> = _isConverting.asStateFlow()
 
-    fun onConvertClicked() {
-        if (inputFile != null) { // This is gross - pass the value around instead, dumbass.
+    fun onConvertClicked(inputUri: Uri) {
+        if (inputUri != Uri.EMPTY) {
             viewModelScope.launch { _uiEvents.emit(OpenOutputFileChooser) }
         }
     }
@@ -44,16 +41,16 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun onInputFileChosen(uri: Uri?) {
-        inputFile = uri
+        _inputFile.value = uri ?: Uri.EMPTY
     }
 
-    fun onOutputPathChosen(outputPath: Uri?) {
-        val input = inputFile
-
-        if (input != null && outputPath != null) {
+    fun onOutputPathChosen(inputUri: Uri, outputUri: Uri) {
+        if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
             viewModelScope.launch(Dispatchers.IO) {
-                val result = pcmDecoder.decodeToPcm(input, outputPath)
+                _isConverting.value = true
+                val result = audioFileConverter.convertAudioFile(inputUri, outputUri)
                 Log.d("MainScreenViewModel", "result: $result")
+                _isConverting.value = false
             }
         }
     }
