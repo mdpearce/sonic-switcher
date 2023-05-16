@@ -1,11 +1,12 @@
 package com.neaniesoft.sonicswitcher.screens.mainscreen
 
 import android.net.Uri
-import android.os.Environment
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.sonicswitcher.converter.PcmDecoder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -33,12 +34,8 @@ class MainScreenViewModel @Inject constructor(
         }
 
     fun onConvertClicked() {
-        val uri = inputFile
-        if (uri != null) {
-            pcmDecoder.decodeToPcm(
-                uri,
-                Environment.getExternalStorageDirectory().path + "output.pcm"
-            )
+        if (inputFile != null) { // This is gross - pass the value around instead, dumbass.
+            viewModelScope.launch { _uiEvents.emit(OpenOutputFileChooser) }
         }
     }
 
@@ -49,7 +46,19 @@ class MainScreenViewModel @Inject constructor(
     fun onInputFileChosen(uri: Uri?) {
         inputFile = uri
     }
+
+    fun onOutputPathChosen(outputPath: Uri?) {
+        val input = inputFile
+
+        if (input != null && outputPath != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val result = pcmDecoder.decodeToPcm(input, outputPath)
+                Log.d("MainScreenViewModel", "result: $result")
+            }
+        }
+    }
 }
 
 sealed class UiEvents
 object OpenFileChooser : UiEvents()
+object OpenOutputFileChooser : UiEvents()

@@ -17,6 +17,9 @@ class ConverterModule {
     fun provideMediaExtractorFactory(): () -> MediaExtractor = { MediaExtractor() }
 
     @Provides
-    fun providePcmDecoder(mediaExtractorFactory: () -> MediaExtractor, @ApplicationContext context: Context): PcmDecoder =
+    fun providePcmDecoder(
+        mediaExtractorFactory: () -> MediaExtractor,
+        @ApplicationContext context: Context
+    ): PcmDecoder =
         PcmDecoderImpl(mediaExtractorFactory, context)
 }

@@ -25,9 +25,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val inputFileDetails by viewModel.inputFileDetails.collectAsState()
-    val fileChooserLauncher =
+    val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             viewModel.onInputFileChosen(result.data?.data)
+        }
+    val outputFileChooser =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            viewModel.onOutputPathChosen(result.data?.data)
         }
 
     LaunchedEffect(viewModel.uiEvents) {
@@ -38,7 +42,16 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
                         addCategory(Intent.CATEGORY_OPENABLE)
                         type = "audio/*"
                     }
-                    fileChooserLauncher.launch(intent)
+                    inputFileChooser.launch(intent)
+                }
+
+                is OpenOutputFileChooser -> {
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "audio/x-wav"
+                        putExtra(Intent.EXTRA_TITLE, "converted.wav")
+                    }
+                    outputFileChooser.launch(intent)
                 }
             }
         }
