@@ -48,8 +48,8 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
                 is OpenOutputFileChooser -> {
                     val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                         addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "audio/x-wav"
-                        putExtra(Intent.EXTRA_TITLE, "converted.wav")
+                        type = "audio/mpeg"
+                        putExtra(Intent.EXTRA_TITLE, "converted.mp3")
                     }
                     outputFileChooser.launch(intent)
                 }

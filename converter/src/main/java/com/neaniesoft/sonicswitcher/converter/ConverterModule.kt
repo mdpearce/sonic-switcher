@@ -17,9 +17,7 @@ class ConverterModule {
     fun provideMediaExtractorFactory(): () -> MediaExtractor = { MediaExtractor() }
 
     @Provides
-    fun providePcmDecoder(
-        mediaExtractorFactory: () -> MediaExtractor,
+    fun provideAudioFileConverter(
         @ApplicationContext context: Context
-    ): PcmDecoder =
-        PcmDecoderImpl(mediaExtractorFactory, context)
+    ): AudioFileConverter = FFMpegKitDecoder(context)
 }

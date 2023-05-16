@@ -15,3 +15,5 @@ data class OutputFileError(val throwable: Throwable) : ConverterError()
 data class FileNotFoundError(val throwable: Throwable) : ConverterError()
 
 object ProviderCrashed : ConverterError()
+
+object FFMpegError : ConverterError()

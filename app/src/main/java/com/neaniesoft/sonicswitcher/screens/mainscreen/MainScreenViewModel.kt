@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neaniesoft.sonicswitcher.converter.PcmDecoder
+import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val pcmDecoder: PcmDecoder
+    private val pcmDecoder: AudioFileConverter
 ) : ViewModel() {
 
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
