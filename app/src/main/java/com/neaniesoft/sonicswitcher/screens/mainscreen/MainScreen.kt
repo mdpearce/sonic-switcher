@@ -23,11 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.neaniesoft.sonicswitcher.converter.Inactive
+import com.neaniesoft.sonicswitcher.converter.Processing
+import com.neaniesoft.sonicswitcher.converter.ProgressUpdate
 
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val inputFileUri by viewModel.inputFile.collectAsState()
-    val isConverting by viewModel.isConverting.collectAsState()
+    val progress by viewModel.progress.collectAsState()
 
     val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -65,7 +68,7 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
         onConvertClicked = { viewModel.onConvertClicked(inputFileUri) },
         inputFileDetails = inputFileUri.toString(),
-        isConverting = isConverting
+        progress = progress
     )
 }
 
@@ -74,15 +77,18 @@ fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
     onConvertClicked: () -> Unit,
     inputFileDetails: String,
-    isConverting: Boolean
+    progress: ProgressUpdate
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        if (isConverting) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        if (progress is Processing) {
+            CircularProgressIndicator(
+                progress = progress.complete,
+                modifier = Modifier.align(Alignment.Center)
+            )
         } else {
             Text(text = inputFileDetails, modifier = Modifier.align(Alignment.Center))
         }
@@ -107,4 +113,4 @@ fun MainScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, "input file details", false)
+fun PreviewMainScreen() = MainScreenContent({}, {}, "input file details", Inactive)

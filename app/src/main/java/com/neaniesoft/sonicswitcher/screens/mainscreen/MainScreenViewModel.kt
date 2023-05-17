@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
+import com.neaniesoft.sonicswitcher.converter.Inactive
+import com.neaniesoft.sonicswitcher.converter.ProgressUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,8 +29,8 @@ class MainScreenViewModel @Inject constructor(
     private val _inputFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
     val inputFile: StateFlow<Uri> = _inputFile.asStateFlow()
 
-    private val _isConverting: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isConverting: StateFlow<Boolean> = _isConverting.asStateFlow()
+    private val _progress: MutableStateFlow<ProgressUpdate> = MutableStateFlow(Inactive)
+    val progress: StateFlow<ProgressUpdate> = _progress.asStateFlow()
 
     fun onConvertClicked(inputUri: Uri) {
         if (inputUri != Uri.EMPTY) {
@@ -47,10 +49,10 @@ class MainScreenViewModel @Inject constructor(
     fun onOutputPathChosen(inputUri: Uri, outputUri: Uri) {
         if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
             viewModelScope.launch(Dispatchers.IO) {
-                _isConverting.value = true
-                val result = audioFileConverter.convertAudioFile(inputUri, outputUri, {})
+                val result = audioFileConverter.convertAudioFile(inputUri, outputUri) { progress ->
+                    _progress.value = progress
+                }
                 Log.d("MainScreenViewModel", "result: $result")
-                _isConverting.value = false
             }
         }
     }
