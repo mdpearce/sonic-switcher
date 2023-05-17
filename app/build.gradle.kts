@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":converter"))
 
     kapt(libs.dagger.hilt.compiler)
+    implementation(libs.material)
     implementation(libs.dagger.hilt.android)
     implementation(libs.kotlin.result)
     implementation(libs.kotlin.reflect)

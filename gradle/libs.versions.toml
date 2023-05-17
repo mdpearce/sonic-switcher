@@ -32,3 +32,4 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 ffmpeg-kit-audio = { module = "com.arthenica:ffmpeg-kit-audio", version = "5.1" }
+material = { module = "com.google.android.material:material", version = "1.9.0" }
