@@ -13,7 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.neaniesoft.sonicswitcher.screens.mainscreen.MainScreen
-import com.neaniesoft.sonicswitcher.ui.theme.SonicSwitcherTheme
+import com.neaniesoft.sonicswitcher.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            SonicSwitcherTheme {
+            AppTheme {
                 val sharedUri = remember { mutableStateOf(Uri.EMPTY) }
                 val intent: Intent? = intent
                 if (intent?.action == Intent.ACTION_SEND) {
