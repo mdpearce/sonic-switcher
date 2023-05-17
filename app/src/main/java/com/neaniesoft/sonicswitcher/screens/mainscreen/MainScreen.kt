@@ -29,7 +29,7 @@ import com.neaniesoft.sonicswitcher.converter.results.Processing
 import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 
 @Composable
-fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
+fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
     val inputFileUri by viewModel.inputFile.collectAsState()
     val progress by viewModel.progress.collectAsState()
     val inputDisplayName by viewModel.inputDisplayName.collectAsState()
@@ -81,6 +81,10 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
                 }
             }
         }
+    }
+
+    if (sharedUri != Uri.EMPTY) {
+        viewModel.onInputFileChosen(sharedUri)
     }
 
     MainScreenContent(
