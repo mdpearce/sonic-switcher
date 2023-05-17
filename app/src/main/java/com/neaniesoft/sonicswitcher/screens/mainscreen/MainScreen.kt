@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,26 +30,31 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
 import com.neaniesoft.sonicswitcher.converter.results.Processing
-import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 
 @Composable
 fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
-    val inputFileUri by viewModel.inputFile.collectAsState()
-    val progress by viewModel.progress.collectAsState()
-    val inputDisplayName by viewModel.inputDisplayName.collectAsState()
-    val outputFileUri by viewModel.outputFile.collectAsState()
+    val screenState by viewModel.screenState.collectAsState()
 
     val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             viewModel.onInputFileChosen(result.data?.data)
         }
+
     val outputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-            viewModel.onOutputPathChosen(inputFileUri, result.data?.data ?: Uri.EMPTY)
+            viewModel.onOutputFileChosen(
+                screenState.let { state ->
+                    if (state is InputFileChosen) {
+                        state.inputFile
+                    } else {
+                        Uri.EMPTY
+                    }
+                },
+                result.data?.data ?: Uri.EMPTY
+            )
         }
 
     val context = LocalContext.current
-
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collect { event ->
             when (event) {
@@ -92,40 +98,53 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
 
     MainScreenContent(
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
-        onConvertClicked = { viewModel.onConvertClicked(inputFileUri) },
+        onConvertClicked = viewModel::onConvertClicked,
         onShareClicked = viewModel::onShareClicked,
-        progress = progress,
-        inputDisplayName = inputDisplayName,
-        outputFile = outputFileUri
+        screenState = screenState
     )
 }
 
 @Composable
 fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
-    onConvertClicked: () -> Unit,
+    onConvertClicked: (Uri) -> Unit,
     onShareClicked: (Uri) -> Unit,
-    progress: ProgressUpdate,
-    inputDisplayName: String,
-    outputFile: Uri
+    screenState: ScreenState
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        when {
-            progress is Processing -> {
-                CircularProgressIndicator(
-                    progress = progress.complete,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+        when (screenState) {
+            is InputFileChosen -> Text(
+                text = screenState.inputDisplayName,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            is com.neaniesoft.sonicswitcher.screens.mainscreen.Processing -> {
+                screenState.progressUpdate.let { update ->
+                    when (update) {
+                        is Inactive -> {
+                            CircularProgressIndicator(Modifier.align(Alignment.Center))
+                        }
+
+                        is Processing -> {
+                            CircularProgressIndicator(
+                                progress = update.complete,
+                                modifier = Modifier.align(
+                                    Alignment.Center
+                                )
+                            )
+                        }
+                    }
+                }
             }
 
-            outputFile != Uri.EMPTY -> {
+            is Complete -> {
                 Button(
                     modifier = Modifier.align(Alignment.Center),
-                    onClick = { onShareClicked(outputFile) }
+                    onClick = { onShareClicked(screenState.outputFile) }
                 ) {
                     Row {
                         Icon(
@@ -133,13 +152,29 @@ fun MainScreenContent(
                             contentDescription = "Share",
                             Modifier.padding(end = 16.dp)
                         )
-                        Text(text = "Share file")
+                        Text(
+                            text = "Share file",
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
                     }
                 }
             }
 
-            else -> {
-                Text(text = inputDisplayName, modifier = Modifier.align(Alignment.Center))
+            is Error -> {
+                Text(
+                    text = screenState.message,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(
+                        Alignment.Center
+                    )
+                )
+            }
+
+            Empty -> {
+                Text(
+                    text = "Please select a file to begin",
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
 
@@ -153,15 +188,66 @@ fun MainScreenContent(
                 Text(text = "Choose file")
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = { onConvertClicked() }
-            ) {
-                Text(text = "Convert")
+            screenState.let { state ->
+                if (state is InputFileChosen) {
+                    Button(onClick = { onConvertClicked(state.inputFile) }) {
+                        Text(text = "Convert")
+                    }
+                } else {
+                    Button(onClick = {}, enabled = false) {
+                        Text(text = "Convert")
+                    }
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Empty")
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, {}, Inactive, "File.m4a", Uri.EMPTY)
+fun PreviewMainScreen() = MainScreenContent({}, {}, {}, Empty)
+
+@Preview(showBackground = true, name = "Input file chosen")
+@Composable
+fun PreviewMainScreenInputFileChosen() = MainScreenContent(
+    onOpenFileChooserClicked = { },
+    onConvertClicked = {},
+    onShareClicked = {},
+    screenState = InputFileChosen(Uri.parse("http://some/url"), "Somefile.m4a")
+)
+
+@Preview(showBackground = true, name = "Processing Inactive")
+@Composable
+fun PreviewMainScreenProcessingInactive() = MainScreenContent(
+    onOpenFileChooserClicked = {},
+    onConvertClicked = {},
+    onShareClicked = {},
+    screenState = Processing(Inactive)
+)
+
+@Preview(showBackground = true, name = "Processing active")
+@Composable
+fun PreviewMainScreenProcessingActive() = MainScreenContent(
+    onOpenFileChooserClicked = {},
+    onConvertClicked = {},
+    onShareClicked = {},
+    screenState = Processing(Processing(0.5f))
+)
+
+@Preview(showBackground = true, name = "Complete")
+@Composable
+fun PreviewMainScreenComplete() = MainScreenContent(
+    onOpenFileChooserClicked = {},
+    onConvertClicked = {},
+    onShareClicked = {},
+    screenState = Complete(Uri.parse("http://some/url"))
+)
+
+@Preview(showBackground = true, name = "Error")
+@Composable
+fun PreviewMainScreenError() = MainScreenContent(
+    onOpenFileChooserClicked = {},
+    onConvertClicked = {},
+    onShareClicked = {},
+    screenState = Error("Something went wrong")
+)

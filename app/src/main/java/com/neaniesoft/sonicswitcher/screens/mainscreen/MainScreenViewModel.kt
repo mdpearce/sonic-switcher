@@ -5,15 +5,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
+import com.neaniesoft.sonicswitcher.converter.results.ConversionCancelled
 import com.neaniesoft.sonicswitcher.converter.results.ConversionComplete
+import com.neaniesoft.sonicswitcher.converter.results.ConversionError
+import com.neaniesoft.sonicswitcher.converter.results.ConversionException
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
-import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,17 +29,17 @@ class MainScreenViewModel @Inject constructor(
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
     val uiEvents: SharedFlow<UiEvents> = _uiEvents.asSharedFlow()
 
-    private val _inputFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
-    val inputFile: StateFlow<Uri> = _inputFile.asStateFlow()
+    private val _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(Empty)
+    val screenState = _screenState.asStateFlow()
 
-    private val _progress: MutableStateFlow<ProgressUpdate> = MutableStateFlow(Inactive)
-    val progress: StateFlow<ProgressUpdate> = _progress.asStateFlow()
+    fun onOpenFileChooserClicked() {
+        viewModelScope.launch { _uiEvents.emit(OpenFileChooser) }
+    }
 
-    private val _inputDisplayName: MutableStateFlow<String> = MutableStateFlow("")
-    val inputDisplayName = _inputDisplayName.asStateFlow()
-
-    private val _outputFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
-    val outputFile = _outputFile.asStateFlow()
+    fun onInputFileChosen(uri: Uri?) {
+        val finalUri = uri ?: Uri.EMPTY
+        _screenState.value = InputFileChosen(finalUri, getFileDisplayName(finalUri))
+    }
 
     fun onConvertClicked(inputUri: Uri) {
         if (inputUri != Uri.EMPTY) {
@@ -46,24 +47,22 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onOpenFileChooserClicked() {
-        viewModelScope.launch { _uiEvents.emit(OpenFileChooser) }
-    }
-
-    fun onInputFileChosen(uri: Uri?) {
-        _inputFile.value = uri ?: Uri.EMPTY
-        _inputDisplayName.value = uri?.let { getFileDisplayName(it) } ?: ""
-    }
-
-    fun onOutputPathChosen(inputUri: Uri, outputUri: Uri) {
+    fun onOutputFileChosen(inputUri: Uri, outputUri: Uri) {
         if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
+            _screenState.value = Processing(Inactive)
             viewModelScope.launch(Dispatchers.IO) {
-                val result = audioFileConverter.convertAudioFile(inputUri, outputUri) { progress ->
-                    _progress.value = progress
+                val result = try {
+                    audioFileConverter.convertAudioFile(inputUri, outputUri) { progress ->
+                        _screenState.value = Processing(progress)
+                    }
+                } catch (e: ConversionException) {
+                    ConversionError(e)
                 }
                 Log.d("MainScreenViewModel", "result: $result")
-                if (result is ConversionComplete) {
-                    _outputFile.value = outputUri
+                _screenState.value = when (result) {
+                    is ConversionComplete -> Complete(outputUri)
+                    is ConversionCancelled -> Error("Conversion cancelled.")
+                    is ConversionError -> Error(result.throwable.message)
                 }
             }
         }
