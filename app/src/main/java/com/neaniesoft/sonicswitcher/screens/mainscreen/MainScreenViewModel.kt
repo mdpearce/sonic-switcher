@@ -20,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val audioFileConverter: AudioFileConverter
+    private val audioFileConverter: AudioFileConverter,
+    private val getFileDisplayName: GetFileDisplayNameUseCase
 ) : ViewModel() {
 
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
@@ -31,6 +32,9 @@ class MainScreenViewModel @Inject constructor(
 
     private val _progress: MutableStateFlow<ProgressUpdate> = MutableStateFlow(Inactive)
     val progress: StateFlow<ProgressUpdate> = _progress.asStateFlow()
+
+    private val _inputDisplayName: MutableStateFlow<String> = MutableStateFlow("")
+    val inputDisplayName = _inputDisplayName.asStateFlow()
 
     fun onConvertClicked(inputUri: Uri) {
         if (inputUri != Uri.EMPTY) {
@@ -44,6 +48,7 @@ class MainScreenViewModel @Inject constructor(
 
     fun onInputFileChosen(uri: Uri?) {
         _inputFile.value = uri ?: Uri.EMPTY
+        _inputDisplayName.value = uri?.let { getFileDisplayName(it) } ?: ""
     }
 
     fun onOutputPathChosen(inputUri: Uri, outputUri: Uri) {

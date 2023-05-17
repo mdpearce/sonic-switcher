@@ -31,6 +31,7 @@ import com.neaniesoft.sonicswitcher.converter.ProgressUpdate
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val inputFileUri by viewModel.inputFile.collectAsState()
     val progress by viewModel.progress.collectAsState()
+    val inputDisplayName by viewModel.inputDisplayName.collectAsState()
 
     val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -67,8 +68,8 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     MainScreenContent(
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
         onConvertClicked = { viewModel.onConvertClicked(inputFileUri) },
-        inputFileDetails = inputFileUri.toString(),
-        progress = progress
+        progress = progress,
+        inputDisplayName = inputDisplayName
     )
 }
 
@@ -76,8 +77,8 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
 fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
     onConvertClicked: () -> Unit,
-    inputFileDetails: String,
-    progress: ProgressUpdate
+    progress: ProgressUpdate,
+    inputDisplayName: String
 ) {
     Box(
         modifier = Modifier
@@ -90,7 +91,7 @@ fun MainScreenContent(
                 modifier = Modifier.align(Alignment.Center)
             )
         } else {
-            Text(text = inputFileDetails, modifier = Modifier.align(Alignment.Center))
+            Text(text = inputDisplayName, modifier = Modifier.align(Alignment.Center))
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -113,4 +114,4 @@ fun MainScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, "input file details", Inactive)
+fun PreviewMainScreen() = MainScreenContent({}, {}, Inactive, "File.m4a")
