@@ -76,7 +76,7 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
                     val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                         addCategory(Intent.CATEGORY_OPENABLE)
                         type = "audio/mpeg"
-                        putExtra(Intent.EXTRA_TITLE, "converted.mp3")
+                        putExtra(Intent.EXTRA_TITLE, event.defaultFilename)
                     }
                     outputFileChooser.launch(intent)
                 }

@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
     kapt(libs.dagger.hilt.compiler)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
