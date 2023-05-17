@@ -15,9 +15,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neaniesoft.sonicswitcher.R
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
 import com.neaniesoft.sonicswitcher.converter.results.Processing
+import com.neaniesoft.sonicswitcher.ui.theme.AppTheme
 
 @Composable
 fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
@@ -106,6 +110,7 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
@@ -113,91 +118,96 @@ fun MainScreenContent(
     onShareClicked: (Uri) -> Unit,
     screenState: ScreenState
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        when (screenState) {
-            is InputFileChosen -> Text(
-                text = screenState.inputDisplayName,
-                modifier = Modifier.align(Alignment.Center)
-            )
+    Scaffold(topBar = {
+        TopAppBar(title = { Text(text = stringResource(id = R.string.app_name)) })
+    }) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when (screenState) {
+                is InputFileChosen -> Text(
+                    text = screenState.inputDisplayName,
+                    modifier = Modifier.align(Alignment.Center)
+                )
 
-            is com.neaniesoft.sonicswitcher.screens.mainscreen.Processing -> {
-                screenState.progressUpdate.let { update ->
-                    when (update) {
-                        is Inactive -> {
-                            CircularProgressIndicator(Modifier.align(Alignment.Center))
-                        }
+                is com.neaniesoft.sonicswitcher.screens.mainscreen.Processing -> {
+                    screenState.progressUpdate.let { update ->
+                        when (update) {
+                            is Inactive -> {
+                                CircularProgressIndicator(Modifier.align(Alignment.Center))
+                            }
 
-                        is Processing -> {
-                            CircularProgressIndicator(
-                                progress = update.complete,
-                                modifier = Modifier.align(
-                                    Alignment.Center
+                            is Processing -> {
+                                CircularProgressIndicator(
+                                    progress = update.complete,
+                                    modifier = Modifier.align(
+                                        Alignment.Center
+                                    )
                                 )
+                            }
+                        }
+                    }
+                }
+
+                is Complete -> {
+                    Button(
+                        modifier = Modifier.align(Alignment.Center),
+                        onClick = { onShareClicked(screenState.outputFile) }
+                    ) {
+                        Row {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = stringResource(id = R.string.share_content_description),
+                                Modifier.padding(end = 16.dp)
+                            )
+                            Text(
+                                text = stringResource(id = R.string.share_button),
+                                modifier = Modifier.align(Alignment.CenterVertically)
                             )
                         }
                     }
                 }
-            }
 
-            is Complete -> {
-                Button(
-                    modifier = Modifier.align(Alignment.Center),
-                    onClick = { onShareClicked(screenState.outputFile) }
-                ) {
-                    Row {
-                        Icon(
-                            Icons.Default.Share,
-                            contentDescription = stringResource(id = R.string.share_content_description),
-                            Modifier.padding(end = 16.dp)
+                is Error -> {
+                    Text(
+                        text = screenState.message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(
+                            Alignment.Center
                         )
-                        Text(
-                            text = stringResource(id = R.string.share_button),
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
+                    )
+                }
+
+                Empty -> {
+                    Text(
+                        text = stringResource(id = R.string.select_a_file),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
 
-            is Error -> {
-                Text(
-                    text = screenState.message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(
-                        Alignment.Center
-                    )
-                )
-            }
-
-            Empty -> {
-                Text(
-                    text = stringResource(id = R.string.select_a_file),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        ) {
-            Button(onClick = { onOpenFileChooserClicked() }) {
-                Text(text = stringResource(id = R.string.choose_file_button))
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            screenState.let { state ->
-                if (state is InputFileChosen) {
-                    Button(onClick = { onConvertClicked(state.inputFile) }) {
-                        Text(text = stringResource(id = R.string.convert_button))
-                    }
-                } else {
-                    Button(onClick = {}, enabled = false) {
-                        Text(text = stringResource(id = R.string.convert_button))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Button(onClick = { onOpenFileChooserClicked() }) {
+                    Text(text = stringResource(id = R.string.choose_file_button))
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                screenState.let { state ->
+                    if (state is InputFileChosen) {
+                        Button(onClick = { onConvertClicked(state.inputFile) }) {
+                            Text(text = stringResource(id = R.string.convert_button))
+                        }
+                    } else {
+                        Button(onClick = {}, enabled = false) {
+                            Text(text = stringResource(id = R.string.convert_button))
+                        }
                     }
                 }
             }
@@ -207,7 +217,9 @@ fun MainScreenContent(
 
 @Preview(showBackground = true, name = "Empty")
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, {}, Empty)
+fun PreviewMainScreen() = AppTheme {
+    MainScreenContent({}, {}, {}, Empty)
+}
 
 @Preview(showBackground = true, name = "Input file chosen")
 @Composable
