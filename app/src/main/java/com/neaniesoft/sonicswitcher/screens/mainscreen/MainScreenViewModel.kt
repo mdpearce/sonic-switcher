@@ -48,7 +48,7 @@ class MainScreenViewModel @Inject constructor(
         if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
             viewModelScope.launch(Dispatchers.IO) {
                 _isConverting.value = true
-                val result = audioFileConverter.convertAudioFile(inputUri, outputUri)
+                val result = audioFileConverter.convertAudioFile(inputUri, outputUri, {})
                 Log.d("MainScreenViewModel", "result: $result")
                 _isConverting.value = false
             }

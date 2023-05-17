@@ -5,7 +5,9 @@ import android.net.Uri
 import android.util.Log
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.FFmpegKitConfig
+import com.arthenica.ffmpegkit.FFprobeKit
 import com.arthenica.ffmpegkit.Level
+import com.arthenica.ffmpegkit.MediaInformation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -15,13 +17,18 @@ class FFMpegKitDecoder(private val context: Context) : AudioFileConverter {
         private const val TAG = "FFMpegKitDecoder"
     }
 
-    override suspend fun convertAudioFile(input: Uri, output: Uri): ConversionResult =
-        suspendCancellableCoroutine { cont ->
-            val inputPath = FFmpegKitConfig.getSafParameterForRead(context, input)
-            val outputPath = FFmpegKitConfig.getSafParameterForWrite(context, output)
+    override suspend fun convertAudioFile(
+        input: Uri,
+        output: Uri,
+        onProgressUpdated: (Int) -> Unit
+    ): ConversionResult {
+        val inputPath = FFmpegKitConfig.getSafParameterForRead(context, input)
+        val outputPath = FFmpegKitConfig.getSafParameterForWrite(context, output)
+        val mediaInformation = getMediaInformation(inputPath)
+        val totalTime = mediaInformation.duration.toDouble()
 
+        return suspendCancellableCoroutine { cont ->
             Log.d(TAG, "Starting FFMpeg session")
-
             val session = FFmpegKit.executeAsync(
                 "-i $inputPath -acodec libmp3lame -b:a 256k $outputPath",
                 { session ->
@@ -66,11 +73,25 @@ class FFMpegKitDecoder(private val context: Context) : AudioFileConverter {
                         Level.AV_LOG_TRACE -> {
                             { Log.v(TAG, it) }
                         }
+
+                        null -> {
+                            { throw IllegalArgumentException("Unsupported log level ${log.level}") }
+                        }
                     }
                     logFn(log.message)
                 },
-                { statistics -> Log.d(TAG, "Statistics update: ${statistics.time}") }
+                { statistics ->
+                    val currentProgress = (statistics.time / 100.0) / totalTime
+                    onProgressUpdated(currentProgress.toInt())
+                }
             )
             cont.invokeOnCancellation { session.cancel() }
         }
+    }
+
+    private fun getMediaInformation(path: String): MediaInformation {
+        val session = FFprobeKit.getMediaInformation(path)
+        return session.mediaInformation
+            ?: throw IllegalStateException("Unable to get media information. Return code: ${session.returnCode}, ${session.state}: ${session.failStackTrace}")
+    }
 }

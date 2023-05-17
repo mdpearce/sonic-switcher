@@ -3,7 +3,7 @@ package com.neaniesoft.sonicswitcher.converter
 import android.net.Uri
 
 interface AudioFileConverter {
-    suspend fun convertAudioFile(input: Uri, output: Uri): ConversionResult
+    suspend fun convertAudioFile(input: Uri, output: Uri, onProgressUpdated: (Int) -> Unit): ConversionResult
 }
 
 sealed class ConversionResult
