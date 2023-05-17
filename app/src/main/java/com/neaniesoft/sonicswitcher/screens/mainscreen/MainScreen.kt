@@ -25,9 +25,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.neaniesoft.sonicswitcher.R
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
 import com.neaniesoft.sonicswitcher.converter.results.Processing
 
@@ -149,11 +151,11 @@ fun MainScreenContent(
                     Row {
                         Icon(
                             Icons.Default.Share,
-                            contentDescription = "Share",
+                            contentDescription = stringResource(id = R.string.share_content_description),
                             Modifier.padding(end = 16.dp)
                         )
                         Text(
-                            text = "Share file",
+                            text = stringResource(id = R.string.share_button),
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
@@ -172,7 +174,7 @@ fun MainScreenContent(
 
             Empty -> {
                 Text(
-                    text = "Please select a file to begin",
+                    text = stringResource(id = R.string.select_a_file),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -185,17 +187,17 @@ fun MainScreenContent(
                 .fillMaxWidth()
         ) {
             Button(onClick = { onOpenFileChooserClicked() }) {
-                Text(text = "Choose file")
+                Text(text = stringResource(id = R.string.choose_file_button))
             }
             Spacer(modifier = Modifier.weight(1f))
             screenState.let { state ->
                 if (state is InputFileChosen) {
                     Button(onClick = { onConvertClicked(state.inputFile) }) {
-                        Text(text = "Convert")
+                        Text(text = stringResource(id = R.string.convert_button))
                     }
                 } else {
                     Button(onClick = {}, enabled = false) {
-                        Text(text = "Convert")
+                        Text(text = stringResource(id = R.string.convert_button))
                     }
                 }
             }
