@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.neaniesoft.sonicswitcher.converter.Inactive
-import com.neaniesoft.sonicswitcher.converter.Processing
-import com.neaniesoft.sonicswitcher.converter.ProgressUpdate
+import com.neaniesoft.sonicswitcher.converter.results.Inactive
+import com.neaniesoft.sonicswitcher.converter.results.Processing
+import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {

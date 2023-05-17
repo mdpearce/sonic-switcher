@@ -8,11 +8,18 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFprobeKit
 import com.arthenica.ffmpegkit.Level
 import com.arthenica.ffmpegkit.MediaInformation
+import com.neaniesoft.sonicswitcher.converter.results.ConversionCancelled
+import com.neaniesoft.sonicswitcher.converter.results.ConversionComplete
+import com.neaniesoft.sonicswitcher.converter.results.ConversionException
+import com.neaniesoft.sonicswitcher.converter.results.ConversionResult
+import com.neaniesoft.sonicswitcher.converter.results.Inactive
+import com.neaniesoft.sonicswitcher.converter.results.Processing
+import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class FFMpegKitDecoder(private val context: Context) : AudioFileConverter {
+class FFMpegKitConverter(private val context: Context) : AudioFileConverter {
     companion object {
         private const val TAG = "FFMpegKitDecoder"
     }

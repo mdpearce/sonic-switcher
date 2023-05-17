@@ -1,7 +1,9 @@
-package com.neaniesoft.sonicswitcher.converter
+package com.neaniesoft.sonicswitcher.converter.di
 
 import android.content.Context
 import android.media.MediaExtractor
+import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
+import com.neaniesoft.sonicswitcher.converter.FFMpegKitConverter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,5 +21,5 @@ class ConverterModule {
     @Provides
     fun provideAudioFileConverter(
         @ApplicationContext context: Context
-    ): AudioFileConverter = FFMpegKitDecoder(context)
+    ): AudioFileConverter = FFMpegKitConverter(context)
 }

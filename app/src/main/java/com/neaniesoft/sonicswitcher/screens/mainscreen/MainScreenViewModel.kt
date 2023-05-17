@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
-import com.neaniesoft.sonicswitcher.converter.Inactive
-import com.neaniesoft.sonicswitcher.converter.ProgressUpdate
+import com.neaniesoft.sonicswitcher.converter.results.Inactive
+import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,7 +62,3 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 }
-
-sealed class UiEvents
-object OpenFileChooser : UiEvents()
-object OpenOutputFileChooser : UiEvents()
