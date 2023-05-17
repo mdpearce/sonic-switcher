@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +33,7 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val inputFileUri by viewModel.inputFile.collectAsState()
     val progress by viewModel.progress.collectAsState()
     val inputDisplayName by viewModel.inputDisplayName.collectAsState()
+    val outputFileUri by viewModel.outputFile.collectAsState()
 
     val inputFileChooser =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -41,6 +43,8 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             viewModel.onOutputPathChosen(inputFileUri, result.data?.data ?: Uri.EMPTY)
         }
+
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collect { event ->
@@ -61,6 +65,20 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
                     }
                     outputFileChooser.launch(intent)
                 }
+
+                is OpenShareSheet -> {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        putExtra(Intent.EXTRA_STREAM, event.uri)
+                        type = "audio/mpeg"
+                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
+                    context.grantUriPermission(
+                        context.packageName,
+                        event.uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                    context.startActivity(intent)
+                }
             }
         }
     }
@@ -68,8 +86,10 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     MainScreenContent(
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
         onConvertClicked = { viewModel.onConvertClicked(inputFileUri) },
+        onShareClicked = viewModel::onShareClicked,
         progress = progress,
-        inputDisplayName = inputDisplayName
+        inputDisplayName = inputDisplayName,
+        outputFile = outputFileUri
     )
 }
 
@@ -77,22 +97,38 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
 fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
     onConvertClicked: () -> Unit,
+    onShareClicked: (Uri) -> Unit,
     progress: ProgressUpdate,
-    inputDisplayName: String
+    inputDisplayName: String,
+    outputFile: Uri
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        if (progress is Processing) {
-            CircularProgressIndicator(
-                progress = progress.complete,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        } else {
-            Text(text = inputDisplayName, modifier = Modifier.align(Alignment.Center))
+        when {
+            progress is Processing -> {
+                CircularProgressIndicator(
+                    progress = progress.complete,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            outputFile != Uri.EMPTY -> {
+                Button(
+                    modifier = Modifier.align(Alignment.Center),
+                    onClick = { onShareClicked(outputFile) }
+                ) {
+                    Text(text = "Share file")
+                }
+            }
+
+            else -> {
+                Text(text = inputDisplayName, modifier = Modifier.align(Alignment.Center))
+            }
         }
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
@@ -114,4 +150,4 @@ fun MainScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() = MainScreenContent({}, {}, Inactive, "File.m4a")
+fun PreviewMainScreen() = MainScreenContent({}, {}, {}, Inactive, "File.m4a", Uri.EMPTY)

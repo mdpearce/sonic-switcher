@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neaniesoft.sonicswitcher.converter.AudioFileConverter
+import com.neaniesoft.sonicswitcher.converter.results.ConversionComplete
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
 import com.neaniesoft.sonicswitcher.converter.results.ProgressUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,9 @@ class MainScreenViewModel @Inject constructor(
     private val _inputDisplayName: MutableStateFlow<String> = MutableStateFlow("")
     val inputDisplayName = _inputDisplayName.asStateFlow()
 
+    private val _outputFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
+    val outputFile = _outputFile.asStateFlow()
+
     fun onConvertClicked(inputUri: Uri) {
         if (inputUri != Uri.EMPTY) {
             viewModelScope.launch { _uiEvents.emit(OpenOutputFileChooser) }
@@ -58,7 +62,16 @@ class MainScreenViewModel @Inject constructor(
                     _progress.value = progress
                 }
                 Log.d("MainScreenViewModel", "result: $result")
+                if (result is ConversionComplete) {
+                    _outputFile.value = outputUri
+                }
             }
+        }
+    }
+
+    fun onShareClicked(uri: Uri) {
+        viewModelScope.launch {
+            _uiEvents.emit(OpenShareSheet(uri))
         }
     }
 }
