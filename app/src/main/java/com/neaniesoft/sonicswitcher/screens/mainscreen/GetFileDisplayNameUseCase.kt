@@ -16,14 +16,14 @@ class GetFileDisplayNameUseCase @Inject constructor(
                     if (index >= 0) {
                         cursor.getString(index)
                     } else {
-                        uri.pathSegments.lastOrNull() ?: ""
+                        null
                     }
                 } else {
-                    uri.pathSegments.lastOrNull() ?: ""
+                    null
                 }
             }
         } else {
-            uri.pathSegments.lastOrNull() ?: ""
-        }
+            null
+        } ?: uri.pathSegments.lastOrNull() ?: ""
     }
 }
