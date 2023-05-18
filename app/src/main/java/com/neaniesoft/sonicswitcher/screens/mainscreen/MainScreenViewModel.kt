@@ -39,7 +39,11 @@ class MainScreenViewModel @Inject constructor(
 
     fun onInputFileChosen(uri: Uri?) {
         val finalUri = uri ?: Uri.EMPTY
-        _screenState.value = InputFileChosen(finalUri, getFileDisplayName(finalUri))
+        _screenState.value = if (finalUri != Uri.EMPTY) {
+            InputFileChosen(finalUri, getFileDisplayName(finalUri))
+        } else {
+            Empty
+        }
     }
 
     fun onConvertClicked(inputUri: Uri) {
