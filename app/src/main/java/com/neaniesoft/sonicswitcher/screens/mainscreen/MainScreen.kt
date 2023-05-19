@@ -2,6 +2,7 @@ package com.neaniesoft.sonicswitcher.screens.mainscreen
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import com.neaniesoft.sonicswitcher.ui.theme.AppTheme
 
 @Composable
 fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
+    Log.d("MainScreen", "sharedUri: $sharedUri")
     val screenState by viewModel.screenState.collectAsState()
 
     val inputFileChooser =
@@ -99,7 +101,7 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
     }
 
     if (sharedUri != Uri.EMPTY) {
-        viewModel.onInputFileChosen(sharedUri)
+        viewModel.sharedInputUri = sharedUri
     }
 
     MainScreenContent(
@@ -118,6 +120,7 @@ fun MainScreenContent(
     onShareClicked: (Uri) -> Unit,
     screenState: ScreenState
 ) {
+    Log.d("MainScreenContent", "screenState: $screenState")
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = stringResource(id = R.string.app_name)) })
     }) { innerPadding ->

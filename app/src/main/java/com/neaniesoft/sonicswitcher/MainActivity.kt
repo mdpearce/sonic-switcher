@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 val sharedUri = remember { mutableStateOf(Uri.EMPTY) }
+                Log.d("MainActivity", "sharedUri: ${sharedUri.value}")
                 val intent: Intent? = intent
                 if (intent?.action == Intent.ACTION_SEND) {
                     if (intent.type?.startsWith("audio/") == true) {

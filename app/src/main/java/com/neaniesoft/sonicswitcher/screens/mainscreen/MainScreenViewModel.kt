@@ -24,7 +24,8 @@ import javax.inject.Inject
 class MainScreenViewModel @Inject constructor(
     private val audioFileConverter: AudioFileConverter,
     private val getFileDisplayName: GetFileDisplayNameUseCase,
-    private val buildFilename: BuildFilenameUseCase
+    private val buildFilename: BuildFilenameUseCase,
+    private val copyInputFileToTempDirectory: CopyInputFileToTempDirectoryUseCase
 ) : ViewModel() {
 
     private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
@@ -32,6 +33,14 @@ class MainScreenViewModel @Inject constructor(
 
     private val _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(Empty)
     val screenState = _screenState.asStateFlow()
+
+    var sharedInputUri: Uri = Uri.EMPTY
+        set(value) {
+            if (field != value) {
+                field = value
+                onInputFileChosen(value)
+            }
+        }
 
     fun onOpenFileChooserClicked() {
         viewModelScope.launch { _uiEvents.emit(OpenFileChooser) }
@@ -56,8 +65,9 @@ class MainScreenViewModel @Inject constructor(
         if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
             _screenState.value = Processing(Inactive)
             viewModelScope.launch(Dispatchers.IO) {
+                val tempInputFile = copyInputFileToTempDirectory(inputUri)
                 val result = try {
-                    audioFileConverter.convertAudioFile(inputUri, outputUri) { progress ->
+                    audioFileConverter.convertAudioFile(tempInputFile.uri, outputUri) { progress ->
                         _screenState.value = Processing(progress)
                     }
                 } catch (e: ConversionException) {
@@ -69,6 +79,7 @@ class MainScreenViewModel @Inject constructor(
                     is ConversionCancelled -> Error("Conversion cancelled.")
                     is ConversionError -> Error(result.throwable.message)
                 }
+                tempInputFile.file.delete()
             }
         }
     }
