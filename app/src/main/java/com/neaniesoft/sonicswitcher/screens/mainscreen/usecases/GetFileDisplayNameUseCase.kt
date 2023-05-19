@@ -1,4 +1,4 @@
-package com.neaniesoft.sonicswitcher.screens.mainscreen
+package com.neaniesoft.sonicswitcher.screens.mainscreen.usecases
 
 import android.content.ContentResolver
 import android.content.Context

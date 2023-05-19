@@ -1,4 +1,4 @@
-package com.neaniesoft.sonicswitcher.screens.mainscreen
+package com.neaniesoft.sonicswitcher.screens.mainscreen.usecases
 
 import java.time.Clock
 import java.time.ZoneId

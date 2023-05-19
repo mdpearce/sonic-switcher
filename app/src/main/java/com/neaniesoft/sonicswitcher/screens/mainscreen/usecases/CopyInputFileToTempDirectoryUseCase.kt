@@ -1,10 +1,12 @@
-package com.neaniesoft.sonicswitcher.screens.mainscreen
+package com.neaniesoft.sonicswitcher.screens.mainscreen.usecases
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.neaniesoft.sonicswitcher.di.MainScreenModule
+import com.neaniesoft.sonicswitcher.screens.mainscreen.errors.FileCopyException
+import com.neaniesoft.sonicswitcher.screens.mainscreen.models.FileWithUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileNotFoundException
@@ -48,7 +50,3 @@ class CopyInputFileToTempDirectoryUseCase @Inject constructor(
         }
     }
 }
-
-data class FileWithUri(val file: File, val uri: Uri)
-
-class FileCopyException(message: String, cause: Throwable?) : Exception(message, cause)

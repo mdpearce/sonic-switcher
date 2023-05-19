@@ -10,6 +10,9 @@ import com.neaniesoft.sonicswitcher.converter.results.ConversionComplete
 import com.neaniesoft.sonicswitcher.converter.results.ConversionError
 import com.neaniesoft.sonicswitcher.converter.results.ConversionException
 import com.neaniesoft.sonicswitcher.converter.results.Inactive
+import com.neaniesoft.sonicswitcher.screens.mainscreen.usecases.BuildFilenameUseCase
+import com.neaniesoft.sonicswitcher.screens.mainscreen.usecases.CopyInputFileToTempDirectoryUseCase
+import com.neaniesoft.sonicswitcher.screens.mainscreen.usecases.GetFileDisplayNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
