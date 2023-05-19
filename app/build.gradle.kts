@@ -15,7 +15,7 @@ android {
         applicationId = "com.neaniesoft.sonicswitcher"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.target.sdk.get().toInt()
-        versionCode = 10
+        versionCode = 11
         versionName = "0.0.1-SNAPSHOT"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
