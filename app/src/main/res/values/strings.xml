@@ -5,4 +5,9 @@
     <string name="share_button">Share file</string>
     <string name="choose_file_button">Choose file</string>
     <string name="convert_button">Convert</string>
+    <string name="add_to_queue_button">Add to queue</string>
+    <string name="share_all_button">Share all (%d)</string>
+    <string name="clear_queue_button">Clear queue</string>
+    <string name="queue_header">Queue (%d files)</string>
+    <string name="queue_empty">No files in queue</string>
 </resources>
