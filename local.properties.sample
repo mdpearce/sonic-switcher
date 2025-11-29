@@ -1,0 +1,14 @@
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Copy this file to local.properties and fill in your actual values
+#
+# Location of the SDK. This is only used by Gradle.
+sdk.dir=/path/to/your/Android/sdk
+
+# Keystore configuration for release builds
+# IMPORTANT: Fill in the passwords below and keep local.properties private!
+RELEASE_KEYSTORE_PATH=/path/to/your/keystore.jks
+RELEASE_KEY_ALIAS=your_key_alias
+RELEASE_KEYSTORE_PASSWORD=your_keystore_password
+RELEASE_KEY_PASSWORD=your_key_password
