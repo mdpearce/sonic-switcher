@@ -12,6 +12,7 @@ google-services = "4.4.4"
 firebase-crashlytics = "3.0.6"
 ktlint = "12.1.2"
 room = "2.7.0-alpha12"
+play-publisher = "3.10.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
@@ -23,6 +24,7 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher" }
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
