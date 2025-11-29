@@ -1,6 +1,6 @@
 [versions]
 android-plugin = "8.13.1"
-kotlin = "2.2.21"
+kotlin = "2.2.10"
 ksp = "2.2.10-2.0.2"
 compile-sdk = "36"
 min-sdk = "29"
@@ -11,7 +11,7 @@ hilt = "2.57.2"
 google-services = "4.4.4"
 firebase-crashlytics = "3.0.6"
 ktlint = "12.1.2"
-room = "2.6.1"
+room = "2.7.0-alpha12"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
