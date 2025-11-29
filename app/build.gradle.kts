@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.play.publisher)
 }
 
 // Load keystore properties from local.properties
@@ -26,7 +27,7 @@ android {
         applicationId = "io.github.mdpearce.sonicswitcher"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.target.sdk.get().toInt()
-        versionCode = 11
+        versionCode = 12
         versionName = "0.0.1-SNAPSHOT"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -75,6 +76,19 @@ kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
+}
+
+play {
+    // Service account credentials file (JSON) - keep this file private!
+    // Download from Google Play Console -> Setup -> API access
+    serviceAccountCredentials.set(file("play-store-credentials.json"))
+
+    // Default track for publishing (can be overridden with --track parameter)
+    track.set("internal")
+
+    // Release status: completed, draft, halted, inProgress
+    // Using 'draft' for testing - change to 'completed' when ready to auto-publish
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT)
 }
 
 dependencies {
