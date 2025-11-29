@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -107,12 +108,7 @@ fun MainScreen(
                             type = "audio/mpeg"
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
-                    context.grantUriPermission(
-                        context.packageName,
-                        event.uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                    )
-                    context.startActivity(intent)
+                    context.startActivity(Intent.createChooser(intent, null))
                 }
 
                 is OpenShareSheetForMultiple -> {
@@ -122,13 +118,6 @@ fun MainScreen(
                             type = "audio/mpeg"
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
-                    event.uris.forEach { uri ->
-                        context.grantUriPermission(
-                            context.packageName,
-                            uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                        )
-                    }
                     context.startActivity(Intent.createChooser(intent, null))
                 }
             }
@@ -322,20 +311,23 @@ fun QueueSection(
                 TextButton(onClick = onShareAllClicked) {
                     Icon(
                         Icons.Default.Share,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.share_all_content_description),
                         modifier = Modifier.padding(end = 4.dp),
                     )
                     Text(stringResource(id = R.string.share_all_button, queueCount))
                 }
                 IconButton(onClick = onClearQueueClicked) {
-                    Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.clear_queue_button))
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.clear_queue_content_description),
+                    )
                 }
             }
         }
 
         // Queue list
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
@@ -461,19 +453,19 @@ fun PreviewMainScreenWithQueue() =
                     id = 1,
                     uri = Uri.parse("http://some/url1"),
                     displayName = "converted_file_1.mp3",
-                    timestampMillis = System.currentTimeMillis(),
+                    timestampMillis = 1704067200000L,
                 ),
                 ConvertedFile(
                     id = 2,
                     uri = Uri.parse("http://some/url2"),
                     displayName = "converted_file_2.mp3",
-                    timestampMillis = System.currentTimeMillis(),
+                    timestampMillis = 1704153600000L,
                 ),
                 ConvertedFile(
                     id = 3,
                     uri = Uri.parse("http://some/url3"),
                     displayName = "converted_file_3.mp3",
-                    timestampMillis = System.currentTimeMillis(),
+                    timestampMillis = 1704240000000L,
                 ),
             ),
         queueCount = 3,

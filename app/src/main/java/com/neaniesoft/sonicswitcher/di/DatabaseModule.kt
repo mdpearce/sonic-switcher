@@ -24,7 +24,9 @@ object DatabaseModule {
                 context,
                 SonicSwitcherDatabase::class.java,
                 "sonic_switcher_database",
-            ).build()
+            )
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
 
     @Provides
     fun provideConvertedFileDao(database: SonicSwitcherDatabase): ConvertedFileDao = database.convertedFileDao()
