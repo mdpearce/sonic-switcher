@@ -21,13 +21,16 @@ class MainScreenModule {
 
     @Provides
     @Singleton
-    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver =
-        context.contentResolver
+    fun provideContentResolver(
+        @ApplicationContext context: Context,
+    ): ContentResolver = context.contentResolver
 
     @Provides
     fun provideClock(): Clock = Clock.systemDefaultZone()
 
     @Provides
     @Named(CACHE_DIR)
-    fun provideCacheDir(@ApplicationContext context: Context): File = context.cacheDir
+    fun provideCacheDir(
+        @ApplicationContext context: Context,
+    ): File = context.cacheDir
 }

@@ -24,72 +24,79 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(
-    private val audioFileConverter: AudioFileConverter,
-    private val getFileDisplayName: GetFileDisplayNameUseCase,
-    private val buildFilename: BuildFilenameUseCase,
-    private val copyInputFileToTempDirectory: CopyInputFileToTempDirectoryUseCase
-) : ViewModel() {
+class MainScreenViewModel
+    @Inject
+    constructor(
+        private val audioFileConverter: AudioFileConverter,
+        private val getFileDisplayName: GetFileDisplayNameUseCase,
+        private val buildFilename: BuildFilenameUseCase,
+        private val copyInputFileToTempDirectory: CopyInputFileToTempDirectoryUseCase,
+    ) : ViewModel() {
+        private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
+        val uiEvents: SharedFlow<UiEvents> = _uiEvents.asSharedFlow()
 
-    private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
-    val uiEvents: SharedFlow<UiEvents> = _uiEvents.asSharedFlow()
+        private val _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(Empty)
+        val screenState = _screenState.asStateFlow()
 
-    private val _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(Empty)
-    val screenState = _screenState.asStateFlow()
+        var sharedInputUri: Uri = Uri.EMPTY
+            set(value) {
+                if (field != value) {
+                    field = value
+                    onInputFileChosen(value)
+                }
+            }
 
-    var sharedInputUri: Uri = Uri.EMPTY
-        set(value) {
-            if (field != value) {
-                field = value
-                onInputFileChosen(value)
+        fun onOpenFileChooserClicked() {
+            viewModelScope.launch { _uiEvents.emit(OpenFileChooser) }
+        }
+
+        fun onInputFileChosen(uri: Uri?) {
+            val finalUri = uri ?: Uri.EMPTY
+            _screenState.value =
+                if (finalUri != Uri.EMPTY) {
+                    InputFileChosen(finalUri, getFileDisplayName(finalUri))
+                } else {
+                    Empty
+                }
+        }
+
+        fun onConvertClicked(inputUri: Uri) {
+            if (inputUri != Uri.EMPTY) {
+                viewModelScope.launch { _uiEvents.emit(OpenOutputFileChooser(buildFilename())) }
             }
         }
 
-    fun onOpenFileChooserClicked() {
-        viewModelScope.launch { _uiEvents.emit(OpenFileChooser) }
-    }
-
-    fun onInputFileChosen(uri: Uri?) {
-        val finalUri = uri ?: Uri.EMPTY
-        _screenState.value = if (finalUri != Uri.EMPTY) {
-            InputFileChosen(finalUri, getFileDisplayName(finalUri))
-        } else {
-            Empty
-        }
-    }
-
-    fun onConvertClicked(inputUri: Uri) {
-        if (inputUri != Uri.EMPTY) {
-            viewModelScope.launch { _uiEvents.emit(OpenOutputFileChooser(buildFilename())) }
-        }
-    }
-
-    fun onOutputFileChosen(inputUri: Uri, outputUri: Uri) {
-        if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
-            _screenState.value = Processing(Inactive)
-            viewModelScope.launch(Dispatchers.IO) {
-                val tempInputFile = copyInputFileToTempDirectory(inputUri)
-                val result = try {
-                    audioFileConverter.convertAudioFile(tempInputFile.uri, outputUri) { progress ->
-                        _screenState.value = Processing(progress)
-                    }
-                } catch (e: ConversionException) {
-                    ConversionError(e)
+        fun onOutputFileChosen(
+            inputUri: Uri,
+            outputUri: Uri,
+        ) {
+            if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
+                _screenState.value = Processing(Inactive)
+                viewModelScope.launch(Dispatchers.IO) {
+                    val tempInputFile = copyInputFileToTempDirectory(inputUri)
+                    val result =
+                        try {
+                            audioFileConverter.convertAudioFile(tempInputFile.uri, outputUri) { progress ->
+                                _screenState.value = Processing(progress)
+                            }
+                        } catch (e: ConversionException) {
+                            ConversionError(e)
+                        }
+                    Log.d("MainScreenViewModel", "result: $result")
+                    _screenState.value =
+                        when (result) {
+                            is ConversionComplete -> Complete(outputUri)
+                            is ConversionCancelled -> Error("Conversion cancelled.")
+                            is ConversionError -> Error(result.throwable.message)
+                        }
+                    tempInputFile.file.delete()
                 }
-                Log.d("MainScreenViewModel", "result: $result")
-                _screenState.value = when (result) {
-                    is ConversionComplete -> Complete(outputUri)
-                    is ConversionCancelled -> Error("Conversion cancelled.")
-                    is ConversionError -> Error(result.throwable.message)
-                }
-                tempInputFile.file.delete()
+            }
+        }
+
+        fun onShareClicked(uri: Uri) {
+            viewModelScope.launch {
+                _uiEvents.emit(OpenShareSheet(uri))
             }
         }
     }
-
-    fun onShareClicked(uri: Uri) {
-        viewModelScope.launch {
-            _uiEvents.emit(OpenShareSheet(uri))
-        }
-    }
-}

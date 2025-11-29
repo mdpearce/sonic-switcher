@@ -39,7 +39,10 @@ import com.neaniesoft.sonicswitcher.converter.results.Processing
 import com.neaniesoft.sonicswitcher.ui.theme.AppTheme
 
 @Composable
-fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
+fun MainScreen(
+    sharedUri: Uri,
+    viewModel: MainScreenViewModel = viewModel(),
+) {
     Log.d("MainScreen", "sharedUri: $sharedUri")
     val screenState by viewModel.screenState.collectAsState()
 
@@ -58,7 +61,7 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
                         Uri.EMPTY
                     }
                 },
-                result.data?.data ?: Uri.EMPTY
+                result.data?.data ?: Uri.EMPTY,
             )
         }
 
@@ -67,32 +70,35 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is OpenFileChooser -> {
-                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "audio/*"
-                    }
+                    val intent =
+                        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            type = "audio/*"
+                        }
                     inputFileChooser.launch(intent)
                 }
 
                 is OpenOutputFileChooser -> {
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "audio/mpeg"
-                        putExtra(Intent.EXTRA_TITLE, event.defaultFilename)
-                    }
+                    val intent =
+                        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            type = "audio/mpeg"
+                            putExtra(Intent.EXTRA_TITLE, event.defaultFilename)
+                        }
                     outputFileChooser.launch(intent)
                 }
 
                 is OpenShareSheet -> {
-                    val intent = Intent(Intent.ACTION_SEND).apply {
-                        putExtra(Intent.EXTRA_STREAM, event.uri)
-                        type = "audio/mpeg"
-                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
+                    val intent =
+                        Intent(Intent.ACTION_SEND).apply {
+                            putExtra(Intent.EXTRA_STREAM, event.uri)
+                            type = "audio/mpeg"
+                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        }
                     context.grantUriPermission(
                         context.packageName,
                         event.uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
                     )
                     context.startActivity(intent)
                 }
@@ -108,7 +114,7 @@ fun MainScreen(sharedUri: Uri, viewModel: MainScreenViewModel = viewModel()) {
         onOpenFileChooserClicked = viewModel::onOpenFileChooserClicked,
         onConvertClicked = viewModel::onConvertClicked,
         onShareClicked = viewModel::onShareClicked,
-        screenState = screenState
+        screenState = screenState,
     )
 }
 
@@ -118,22 +124,24 @@ fun MainScreenContent(
     onOpenFileChooserClicked: () -> Unit,
     onConvertClicked: (Uri) -> Unit,
     onShareClicked: (Uri) -> Unit,
-    screenState: ScreenState
+    screenState: ScreenState,
 ) {
     Log.d("MainScreenContent", "screenState: $screenState")
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = stringResource(id = R.string.app_name)) })
     }) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             when (screenState) {
-                is InputFileChosen -> Text(
-                    text = screenState.inputDisplayName,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                is InputFileChosen ->
+                    Text(
+                        text = screenState.inputDisplayName,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
 
                 is com.neaniesoft.sonicswitcher.screens.mainscreen.Processing -> {
                     screenState.progressUpdate.let { update ->
@@ -144,10 +152,11 @@ fun MainScreenContent(
 
                             is Processing -> {
                                 CircularProgressIndicator(
-                                    progress = update.complete,
-                                    modifier = Modifier.align(
-                                        Alignment.Center
-                                    )
+                                    progress = { update.complete },
+                                    modifier =
+                                        Modifier.align(
+                                            Alignment.Center,
+                                        ),
                                 )
                             }
                         }
@@ -157,17 +166,17 @@ fun MainScreenContent(
                 is Complete -> {
                     Button(
                         modifier = Modifier.align(Alignment.Center),
-                        onClick = { onShareClicked(screenState.outputFile) }
+                        onClick = { onShareClicked(screenState.outputFile) },
                     ) {
                         Row {
                             Icon(
                                 Icons.Default.Share,
                                 contentDescription = stringResource(id = R.string.share_content_description),
-                                Modifier.padding(end = 16.dp)
+                                Modifier.padding(end = 16.dp),
                             )
                             Text(
                                 text = stringResource(id = R.string.share_button),
-                                modifier = Modifier.align(Alignment.CenterVertically)
+                                modifier = Modifier.align(Alignment.CenterVertically),
                             )
                         }
                     }
@@ -177,26 +186,28 @@ fun MainScreenContent(
                     Text(
                         text = screenState.message,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(
-                            Alignment.Center
-                        )
+                        modifier =
+                            Modifier.align(
+                                Alignment.Center,
+                            ),
                     )
                 }
 
                 Empty -> {
                     Text(
                         text = stringResource(id = R.string.select_a_file),
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 }
             }
 
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Button(onClick = { onOpenFileChooserClicked() }) {
                     Text(text = stringResource(id = R.string.choose_file_button))
@@ -220,51 +231,57 @@ fun MainScreenContent(
 
 @Preview(showBackground = true, name = "Empty")
 @Composable
-fun PreviewMainScreen() = AppTheme {
-    MainScreenContent({}, {}, {}, Empty)
-}
+fun PreviewMainScreen() =
+    AppTheme {
+        MainScreenContent({}, {}, {}, Empty)
+    }
 
 @Preview(showBackground = true, name = "Input file chosen")
 @Composable
-fun PreviewMainScreenInputFileChosen() = MainScreenContent(
-    onOpenFileChooserClicked = { },
-    onConvertClicked = {},
-    onShareClicked = {},
-    screenState = InputFileChosen(Uri.parse("http://some/url"), "Somefile.m4a")
-)
+fun PreviewMainScreenInputFileChosen() =
+    MainScreenContent(
+        onOpenFileChooserClicked = { },
+        onConvertClicked = {},
+        onShareClicked = {},
+        screenState = InputFileChosen(Uri.parse("http://some/url"), "Somefile.m4a"),
+    )
 
 @Preview(showBackground = true, name = "Processing Inactive")
 @Composable
-fun PreviewMainScreenProcessingInactive() = MainScreenContent(
-    onOpenFileChooserClicked = {},
-    onConvertClicked = {},
-    onShareClicked = {},
-    screenState = Processing(Inactive)
-)
+fun PreviewMainScreenProcessingInactive() =
+    MainScreenContent(
+        onOpenFileChooserClicked = {},
+        onConvertClicked = {},
+        onShareClicked = {},
+        screenState = Processing(Inactive),
+    )
 
 @Preview(showBackground = true, name = "Processing active")
 @Composable
-fun PreviewMainScreenProcessingActive() = MainScreenContent(
-    onOpenFileChooserClicked = {},
-    onConvertClicked = {},
-    onShareClicked = {},
-    screenState = Processing(Processing(0.5f))
-)
+fun PreviewMainScreenProcessingActive() =
+    MainScreenContent(
+        onOpenFileChooserClicked = {},
+        onConvertClicked = {},
+        onShareClicked = {},
+        screenState = Processing(Processing(0.5f)),
+    )
 
 @Preview(showBackground = true, name = "Complete")
 @Composable
-fun PreviewMainScreenComplete() = MainScreenContent(
-    onOpenFileChooserClicked = {},
-    onConvertClicked = {},
-    onShareClicked = {},
-    screenState = Complete(Uri.parse("http://some/url"))
-)
+fun PreviewMainScreenComplete() =
+    MainScreenContent(
+        onOpenFileChooserClicked = {},
+        onConvertClicked = {},
+        onShareClicked = {},
+        screenState = Complete(Uri.parse("http://some/url")),
+    )
 
 @Preview(showBackground = true, name = "Error")
 @Composable
-fun PreviewMainScreenError() = MainScreenContent(
-    onOpenFileChooserClicked = {},
-    onConvertClicked = {},
-    onShareClicked = {},
-    screenState = Error("Something went wrong")
-)
+fun PreviewMainScreenError() =
+    MainScreenContent(
+        onOpenFileChooserClicked = {},
+        onConvertClicked = {},
+        onShareClicked = {},
+        screenState = Error("Something went wrong"),
+    )

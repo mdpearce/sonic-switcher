@@ -20,6 +20,6 @@ class ConverterModule {
 
     @Provides
     fun provideAudioFileConverter(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): AudioFileConverter = FFMpegKitConverter(context)
 }
