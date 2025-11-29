@@ -17,3 +17,6 @@ local.properties
 # Play Store publishing credentials - NEVER commit this!
 /app/play-store-credentials.json
 play-store-credentials.json
+
+# Play Store metadata and configuration
+/app/src/main/play/
