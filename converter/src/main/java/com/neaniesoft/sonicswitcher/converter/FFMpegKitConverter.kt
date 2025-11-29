@@ -48,7 +48,9 @@ class FFMpegKitConverter(private val context: Context) : AudioFileConverter {
                             cont.resume(ConversionCancelled)
                         } else if (returnCode.isValueError) {
                             cont.resumeWithException(
-                                ConversionException("Command failed with state ${session.state} and rc ${session.returnCode}"),
+                                ConversionException(
+                                    "Command failed with state ${session.state} and rc ${session.returnCode}",
+                                ),
                             )
                         } else {
                             cont.resume(ConversionComplete)

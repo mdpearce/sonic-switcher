@@ -10,3 +10,6 @@
 local.properties
 /app/google-services.json
 /app/release/*.aab
+/app/release/*.apk
+/app/release/output-metadata.json
+.vscode/
