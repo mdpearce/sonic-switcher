@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.neaniesoft.sonicswitcher"
+    namespace = "io.github.mdpearce.sonicswitcher"
     compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.neaniesoft.sonicswitcher"
+        applicationId = "io.github.mdpearce.sonicswitcher"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.target.sdk.get().toInt()
         versionCode = 11

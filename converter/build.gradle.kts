@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.neaniesoft.sonicswitcher.converter"
+    namespace = "io.github.mdpearce.sonicswitcher.converter"
     compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {

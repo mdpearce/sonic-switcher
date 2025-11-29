@@ -28,7 +28,7 @@ Android audio converter app (MP3 output) built with Jetpack Compose, Kotlin Coro
 
 ### File Handling
 - Uses Android Storage Access Framework (SAF) URIs throughout
-- `FileProvider` configured for sharing temp files (authority: `com.neaniesoft.sonicswitcher.FileProvider`)
+- `FileProvider` configured for sharing temp files (authority: `io.github.mdpearce.sonicswitcher.FileProvider`)
 - Input files copied to cache dir before conversion to ensure FFmpeg can access them
 - `FFmpegKitConfig.getSafParameterForRead/Write()` wraps URIs for FFmpeg
 
@@ -56,7 +56,7 @@ Android audio converter app (MP3 output) built with Jetpack Compose, Kotlin Coro
 
 ### Package Structure
 ```
-com.neaniesoft.sonicswitcher/
+io.github.mdpearce.sonicswitcher/
 ├── MainActivity (entry point, handles share intents)
 ├── SonicSwitcherApplication (@HiltAndroidApp)
 ├── screens/mainscreen/
