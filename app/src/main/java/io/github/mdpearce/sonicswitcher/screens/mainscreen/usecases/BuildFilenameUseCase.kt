@@ -7,10 +7,11 @@ import javax.inject.Inject
 
 class BuildFilenameUseCase
     @Inject
-    constructor(private val clock: Clock) {
+    constructor(
+        private val clock: Clock,
+    ) {
         private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd (H:mm:ss)")
 
-        operator fun invoke(): String {
-            return "Switched ${formatter.format(clock.instant().atZone(ZoneId.systemDefault()))}.mp3"
-        }
+        operator fun invoke(): String =
+            "Switched ${formatter.format(clock.instant().atZone(ZoneId.systemDefault()))}.mp3"
     }

@@ -6,8 +6,14 @@ sealed class UiEvents
 
 object OpenFileChooser : UiEvents()
 
-data class OpenOutputFileChooser(val defaultFilename: String) : UiEvents()
+data class OpenOutputFileChooser(
+    val defaultFilename: String,
+) : UiEvents()
 
-data class OpenShareSheet(val uri: Uri) : UiEvents()
+data class OpenShareSheet(
+    val uri: Uri,
+) : UiEvents()
 
-data class OpenShareSheetForMultiple(val uris: List<Uri>) : UiEvents()
+data class OpenShareSheetForMultiple(
+    val uris: List<Uri>,
+) : UiEvents()

@@ -6,4 +6,6 @@ object ConversionCancelled : ConversionResult()
 
 object ConversionComplete : ConversionResult()
 
-data class ConversionError(val throwable: ConversionException) : ConversionResult()
+data class ConversionError(
+    val throwable: ConversionException,
+) : ConversionResult()

@@ -13,8 +13,8 @@ class GetFileDisplayNameUseCase
         @ApplicationContext private val context: Context,
         private val contentResolver: ContentResolver,
     ) {
-        operator fun invoke(uri: Uri?): String {
-            return if (uri != null && uri.scheme == "content") {
+        operator fun invoke(uri: Uri?): String =
+            if (uri != null && uri.scheme == "content") {
                 contentResolver.query(uri, null, null, null, null).use { cursor ->
                     if (cursor != null && cursor.moveToFirst()) {
                         val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -30,5 +30,4 @@ class GetFileDisplayNameUseCase
             } else {
                 null
             } ?: uri?.pathSegments?.lastOrNull() ?: "unknown"
-        }
     }

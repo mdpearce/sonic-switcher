@@ -24,8 +24,7 @@ object DatabaseModule {
                 context,
                 SonicSwitcherDatabase::class.java,
                 "sonic_switcher_database",
-            )
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            ).fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
     @Provides

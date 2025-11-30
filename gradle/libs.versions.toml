@@ -10,7 +10,7 @@ lifecycle = "2.10.0"
 hilt = "2.57.2"
 google-services = "4.4.4"
 firebase-crashlytics = "3.0.6"
-ktlint = "12.1.2"
+ktlint = "14.0.1"
 room = "2.7.0-alpha12"
 play-publisher = "3.10.1"
 
