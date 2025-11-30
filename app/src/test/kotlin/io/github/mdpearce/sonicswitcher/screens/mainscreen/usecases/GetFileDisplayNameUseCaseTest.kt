@@ -15,8 +15,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE, sdk = [28])
 class GetFileDisplayNameUseCaseTest {
     private lateinit var context: Context
     private lateinit var contentResolver: ContentResolver
@@ -24,8 +26,8 @@ class GetFileDisplayNameUseCaseTest {
 
     @Before
     fun setup() {
-        context = mockk()
-        contentResolver = mockk()
+        context = mockk(relaxed = true)
+        contentResolver = mockk(relaxed = true)
         useCase = GetFileDisplayNameUseCase(context, contentResolver)
     }
 
