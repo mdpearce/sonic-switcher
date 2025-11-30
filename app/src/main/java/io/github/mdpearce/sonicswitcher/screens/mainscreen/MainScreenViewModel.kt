@@ -13,12 +13,13 @@ import io.github.mdpearce.sonicswitcher.converter.results.ConversionException
 import io.github.mdpearce.sonicswitcher.converter.results.Inactive
 import io.github.mdpearce.sonicswitcher.data.ConvertedFile
 import io.github.mdpearce.sonicswitcher.data.ConvertedFileRepository
+import io.github.mdpearce.sonicswitcher.di.IoDispatcher
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.AddFileToQueueUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.BuildFilenameUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.ClearQueueUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.CopyInputFileToTempDirectoryUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.GetFileDisplayNameUseCase
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -41,6 +42,7 @@ class MainScreenViewModel
         private val addFileToQueue: AddFileToQueueUseCase,
         private val clearQueue: ClearQueueUseCase,
         private val repository: ConvertedFileRepository,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) : ViewModel() {
         private val _uiEvents: MutableSharedFlow<UiEvents> = MutableSharedFlow()
         val uiEvents: SharedFlow<UiEvents> = _uiEvents.asSharedFlow()
@@ -100,7 +102,7 @@ class MainScreenViewModel
         ) {
             if (inputUri != Uri.EMPTY && outputUri != Uri.EMPTY) {
                 _screenState.value = Processing(Inactive)
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch(ioDispatcher) {
                     val tempInputFile = copyInputFileToTempDirectory(inputUri)
                     val result =
                         try {

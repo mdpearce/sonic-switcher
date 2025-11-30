@@ -4,6 +4,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.github.mdpearce.sonicswitcher.data.ConvertedFileRepository
+import io.github.mdpearce.sonicswitcher.screens.mainscreen.models.FileWithUri
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.AddFileToQueueUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.BuildFilenameUseCase
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.ClearQueueUseCase
@@ -11,6 +12,7 @@ import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.CopyInputFil
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.usecases.GetFileDisplayNameUseCase
 import io.github.mdpearce.sonicswitcher.testutil.fakes.FakeAudioFileConverter
 import io.github.mdpearce.sonicswitcher.testutil.fakes.FakeConvertedFileDao
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 
 /**
  * Unit tests for [MainScreenViewModel].
@@ -78,6 +81,7 @@ class MainScreenViewModelTest {
                 addFileToQueue = addFileToQueue,
                 clearQueue = clearQueue,
                 repository = repository,
+                ioDispatcher = testDispatcher,
             )
     }
 
@@ -174,13 +178,85 @@ class MainScreenViewModelTest {
             }
         }
 
-    // TODO: These tests require injecting a test dispatcher for Dispatchers.IO
-    // They are commented out as they fail due to timing issues with Dispatchers.IO
-    // We should refactor MainScreenViewModel to accept a CoroutineDispatcher for easier testing
+    @Test
+    fun `successful conversion transitions through Processing to Complete state`() =
+        runTest {
+            // Arrange
+            val inputUri = Uri.parse("content://audio/input")
+            val outputUri = Uri.parse("content://audio/output")
+            val tempFile = File.createTempFile("test", ".mp3")
+            val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
 
-    // successful conversion transitions through Processing to Complete state - SKIPPED
-    // failed conversion transitions to Error state - SKIPPED
-    // processing state transitions during conversion - SKIPPED
+            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+            audioFileConverter.shouldSucceed = true
+            audioFileConverter.conversionDelayMs = 50
+
+            // Act
+            viewModel.onOutputFileChosen(inputUri, outputUri)
+            advanceUntilIdle()
+
+            // Assert
+            val finalState = viewModel.screenState.value
+            assertThat(finalState).isInstanceOf(Complete::class.java)
+            assertThat((finalState as Complete).outputFile).isEqualTo(outputUri)
+
+            // Verify temp file was deleted
+            assertThat(tempFile.exists()).isFalse()
+
+            // Verify conversion was called with correct URIs
+            assertThat(audioFileConverter.lastConversionInput).isEqualTo(tempFileWithUri.uri)
+            assertThat(audioFileConverter.lastConversionOutput).isEqualTo(outputUri)
+        }
+
+    @Test
+    fun `failed conversion transitions to Error state`() =
+        runTest {
+            // Arrange
+            val inputUri = Uri.parse("content://audio/input")
+            val outputUri = Uri.parse("content://audio/output")
+            val tempFile = File.createTempFile("test", ".mp3")
+            val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
+            val errorMessage = "FFmpeg conversion failed"
+
+            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+            audioFileConverter.shouldSucceed = false
+            audioFileConverter.errorMessage = errorMessage
+
+            // Act
+            viewModel.onOutputFileChosen(inputUri, outputUri)
+            advanceUntilIdle()
+
+            // Assert
+            val finalState = viewModel.screenState.value
+            assertThat(finalState).isInstanceOf(Error::class.java)
+            assertThat((finalState as Error).message).isEqualTo(errorMessage)
+
+            // Verify temp file was still deleted even on error
+            assertThat(tempFile.exists()).isFalse()
+        }
+
+    @Test
+    fun `processing state updates during conversion`() =
+        runTest {
+            // Arrange
+            val inputUri = Uri.parse("content://audio/input")
+            val outputUri = Uri.parse("content://audio/output")
+            val tempFile = File.createTempFile("test", ".mp3")
+            val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
+
+            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+            audioFileConverter.shouldSucceed = true
+
+            // Act
+            viewModel.onOutputFileChosen(inputUri, outputUri)
+            advanceUntilIdle()
+
+            // Assert - final state should be Complete after processing
+            val finalState = viewModel.screenState.value
+            assertThat(finalState).isInstanceOf(Complete::class.java)
+
+            tempFile.delete()
+        }
 
     @Test
     fun `onShareClicked emits OpenShareSheet event with URI`() =
