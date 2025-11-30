@@ -7,6 +7,8 @@ import com.google.common.truth.Truth.assertThat
 import io.github.mdpearce.sonicswitcher.screens.mainscreen.errors.FileCopyException
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,22 +56,23 @@ class CopyInputFileToTempDirectoryUseCaseTest {
     }
 
     @Test
-    fun `throws FileCopyException on FileNotFoundException`() {
-        // Arrange
-        val inputUri =
-            mockk<Uri>(relaxed = true) {
-                every { scheme } returns "content"
-            }
-        every { getFileDisplayName(inputUri) } returns "missing.mp3"
-        every { contentResolver.openInputStream(inputUri) } throws FileNotFoundException("File not found")
+    fun `throws FileCopyException on FileNotFoundException`() =
+        runTest {
+            // Arrange
+            val inputUri =
+                mockk<Uri>(relaxed = true) {
+                    every { scheme } returns "content"
+                }
+            every { getFileDisplayName(inputUri) } returns "missing.mp3"
+            every { contentResolver.openInputStream(inputUri) } throws FileNotFoundException("File not found")
 
-        // Act & Assert
-        try {
-            useCase(inputUri)
-            assertThat(false).isTrue() // Should not reach here
-        } catch (e: FileCopyException) {
-            assertThat(e.message).contains("File not found")
-            assertThat(e.cause).isInstanceOf(FileNotFoundException::class.java)
+            // Act & Assert
+            try {
+                useCase(inputUri)
+                fail("Expected FileCopyException to be thrown")
+            } catch (e: FileCopyException) {
+                assertThat(e.message).contains("File not found")
+                assertThat(e.cause).isInstanceOf(FileNotFoundException::class.java)
+            }
         }
-    }
 }

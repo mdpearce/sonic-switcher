@@ -63,7 +63,7 @@ class GetFileDisplayNameUseCaseTest {
     }
 
     @Test
-    fun `returns unknown when content resolver query returns null cursor`() {
+    fun `returns last path segment when content resolver query returns null cursor`() {
         // Arrange
         val uri = Uri.parse("content://media/audio/123")
         every { contentResolver.query(uri, null, null, null, null) } returns null

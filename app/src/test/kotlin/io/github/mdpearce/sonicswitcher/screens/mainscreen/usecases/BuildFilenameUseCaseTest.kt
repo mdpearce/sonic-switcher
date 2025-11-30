@@ -65,27 +65,31 @@ class BuildFilenameUseCaseTest {
     @Test
     fun `filename at midnight uses correct format`() {
         // Arrange
-        clock.setInstant(Instant.parse("2024-01-01T00:00:00Z"))
+        val instant = Instant.parse("2024-01-01T00:00:00Z")
+        clock.setInstant(instant)
 
         // Act
         val result = useCase()
 
         // Assert
         // Format should handle midnight correctly with single-digit hour
-        assertThat(result).contains("2024-01-01")
+        val expectedDate = instant.atZone(ZoneId.systemDefault()).toLocalDate().toString()
+        assertThat(result).contains(expectedDate)
         assertThat(result.matches(Regex("Switched \\d{4}-\\d{2}-\\d{2} \\(\\d{1,2}:\\d{2}:\\d{2}\\)\\.mp3"))).isTrue()
     }
 
     @Test
     fun `filename at noon uses correct format`() {
         // Arrange
-        clock.setInstant(Instant.parse("2024-06-15T12:00:00Z"))
+        val instant = Instant.parse("2024-06-15T12:00:00Z")
+        clock.setInstant(instant)
 
         // Act
         val result = useCase()
 
         // Assert
-        assertThat(result).contains("2024-06-15")
+        val expectedDate = instant.atZone(ZoneId.systemDefault()).toLocalDate().toString()
+        assertThat(result).contains(expectedDate)
         // Time portion will vary based on system timezone
         assertThat(result).endsWith(".mp3")
     }
