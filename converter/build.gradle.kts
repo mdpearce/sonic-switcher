@@ -50,7 +50,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.ffmpeg.kit.audio)
     api(libs.kotlin.result)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.truth)
 }
