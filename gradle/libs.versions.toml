@@ -14,6 +14,14 @@ ktlint = "12.1.2"
 room = "2.7.0-alpha12"
 play-publisher = "3.10.1"
 
+# Testing
+turbine = "1.1.0"
+mockk = "1.13.13"
+coroutines-test = "1.9.0"
+robolectric = "4.14.1"
+arch-core-testing = "2.2.0"
+truth = "1.4.4"
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-plugin" }
@@ -56,3 +64,13 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.6.0"
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
+# Testing
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
+androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "arch-core-testing" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
