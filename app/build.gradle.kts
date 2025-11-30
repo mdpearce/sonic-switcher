@@ -79,16 +79,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
-    // Configure testShared source set for shared test utilities
-    sourceSets {
-        getByName("test") {
-            java.srcDirs("src/testShared/kotlin")
-        }
-        getByName("androidTest") {
-            java.srcDirs("src/testShared/kotlin")
-        }
-    }
 }
 
 kotlin {
