@@ -12,7 +12,7 @@ google-services = "4.4.4"
 firebase-crashlytics = "3.0.6"
 ktlint = "14.0.1"
 room = "2.8.4"
-play-publisher = "3.10.1"
+play-publisher = "3.12.2"
 
 # Testing
 turbine = "1.1.0"
