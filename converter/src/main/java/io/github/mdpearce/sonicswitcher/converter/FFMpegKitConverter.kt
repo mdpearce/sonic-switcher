@@ -19,7 +19,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class FFMpegKitConverter(private val context: Context) : AudioFileConverter {
+class FFMpegKitConverter(
+    private val context: Context,
+) : AudioFileConverter {
     companion object {
         private const val TAG = "FFMpegKitDecoder"
     }

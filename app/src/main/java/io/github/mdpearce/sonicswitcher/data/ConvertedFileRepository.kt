@@ -20,8 +20,7 @@ class ConvertedFileRepository
          * Flow of all converted files in the queue, ordered by newest first.
          */
         fun getAllFiles(): Flow<List<ConvertedFile>> =
-            dao.getAllFiles().map {
-                    entities ->
+            dao.getAllFiles().map { entities ->
                 entities.map { it.toDomainModel() }
             }
 

@@ -44,11 +44,10 @@ class CopyInputFileToTempDirectoryUseCase
             }
         }
 
-        private fun File.contentUri(): Uri {
-            return try {
+        private fun File.contentUri(): Uri =
+            try {
                 FileProvider.getUriForFile(context, "io.github.mdpearce.sonicswitcher.FileProvider", this)
             } catch (e: IllegalArgumentException) {
                 throw FileCopyException("Could not get Uri for File", e)
             }
-        }
     }

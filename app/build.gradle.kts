@@ -21,12 +21,21 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "io.github.mdpearce.sonicswitcher"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
+    compileSdk =
+        libs.versions.compile.sdk
+            .get()
+            .toInt()
 
     defaultConfig {
         applicationId = "io.github.mdpearce.sonicswitcher"
-        minSdk = libs.versions.min.sdk.get().toInt()
-        targetSdk = libs.versions.target.sdk.get().toInt()
+        minSdk =
+            libs.versions.min.sdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.target.sdk
+                .get()
+                .toInt()
         versionCode = 12
         versionName = "0.0.1-SNAPSHOT"
 
