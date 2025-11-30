@@ -15,12 +15,12 @@ room = "2.8.4"
 play-publisher = "3.12.2"
 
 # Testing
-turbine = "1.1.0"
-mockk = "1.13.13"
-coroutines-test = "1.9.0"
-robolectric = "4.14.1"
+turbine = "1.2.1"
+mockk = "1.14.6"
+coroutines-test = "1.10.2"
+robolectric = "4.16"
 arch-core-testing = "2.2.0"
-truth = "1.4.4"
+truth = "1.4.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
