@@ -187,25 +187,32 @@ class MainScreenViewModelTest {
             val tempFile = File.createTempFile("test", ".mp3")
             val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
 
-            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
-            audioFileConverter.shouldSucceed = true
-            audioFileConverter.conversionDelayMs = 50
+            try {
+                coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+                audioFileConverter.shouldSucceed = true
+                audioFileConverter.conversionDelayMs = 50
 
-            // Act
-            viewModel.onOutputFileChosen(inputUri, outputUri)
-            advanceUntilIdle()
+                // Act
+                viewModel.onOutputFileChosen(inputUri, outputUri)
+                advanceUntilIdle()
 
-            // Assert
-            val finalState = viewModel.screenState.value
-            assertThat(finalState).isInstanceOf(Complete::class.java)
-            assertThat((finalState as Complete).outputFile).isEqualTo(outputUri)
+                // Assert
+                val finalState = viewModel.screenState.value
+                assertThat(finalState).isInstanceOf(Complete::class.java)
+                assertThat((finalState as Complete).outputFile).isEqualTo(outputUri)
 
-            // Verify temp file was deleted
-            assertThat(tempFile.exists()).isFalse()
+                // Verify temp file was deleted
+                assertThat(tempFile.exists()).isFalse()
 
-            // Verify conversion was called with correct URIs
-            assertThat(audioFileConverter.lastConversionInput).isEqualTo(tempFileWithUri.uri)
-            assertThat(audioFileConverter.lastConversionOutput).isEqualTo(outputUri)
+                // Verify conversion was called with correct URIs
+                assertThat(audioFileConverter.lastConversionInput).isEqualTo(tempFileWithUri.uri)
+                assertThat(audioFileConverter.lastConversionOutput).isEqualTo(outputUri)
+            } finally {
+                // Ensure cleanup even if test fails
+                if (tempFile.exists()) {
+                    tempFile.delete()
+                }
+            }
         }
 
     @Test
@@ -218,21 +225,28 @@ class MainScreenViewModelTest {
             val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
             val errorMessage = "FFmpeg conversion failed"
 
-            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
-            audioFileConverter.shouldSucceed = false
-            audioFileConverter.errorMessage = errorMessage
+            try {
+                coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+                audioFileConverter.shouldSucceed = false
+                audioFileConverter.errorMessage = errorMessage
 
-            // Act
-            viewModel.onOutputFileChosen(inputUri, outputUri)
-            advanceUntilIdle()
+                // Act
+                viewModel.onOutputFileChosen(inputUri, outputUri)
+                advanceUntilIdle()
 
-            // Assert
-            val finalState = viewModel.screenState.value
-            assertThat(finalState).isInstanceOf(Error::class.java)
-            assertThat((finalState as Error).message).isEqualTo(errorMessage)
+                // Assert
+                val finalState = viewModel.screenState.value
+                assertThat(finalState).isInstanceOf(Error::class.java)
+                assertThat((finalState as Error).message).isEqualTo(errorMessage)
 
-            // Verify temp file was still deleted even on error
-            assertThat(tempFile.exists()).isFalse()
+                // Verify temp file was still deleted even on error
+                assertThat(tempFile.exists()).isFalse()
+            } finally {
+                // Ensure cleanup even if test fails
+                if (tempFile.exists()) {
+                    tempFile.delete()
+                }
+            }
         }
 
     @Test
@@ -244,18 +258,21 @@ class MainScreenViewModelTest {
             val tempFile = File.createTempFile("test", ".mp3")
             val tempFileWithUri = FileWithUri(tempFile, Uri.fromFile(tempFile))
 
-            coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
-            audioFileConverter.shouldSucceed = true
+            try {
+                coEvery { copyInputFileToTempDirectory(inputUri) } returns tempFileWithUri
+                audioFileConverter.shouldSucceed = true
 
-            // Act
-            viewModel.onOutputFileChosen(inputUri, outputUri)
-            advanceUntilIdle()
+                // Act
+                viewModel.onOutputFileChosen(inputUri, outputUri)
+                advanceUntilIdle()
 
-            // Assert - final state should be Complete after processing
-            val finalState = viewModel.screenState.value
-            assertThat(finalState).isInstanceOf(Complete::class.java)
-
-            tempFile.delete()
+                // Assert - final state should be Complete after processing
+                val finalState = viewModel.screenState.value
+                assertThat(finalState).isInstanceOf(Complete::class.java)
+            } finally {
+                // Ensure cleanup even if test fails
+                tempFile.delete()
+            }
         }
 
     @Test

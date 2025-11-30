@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.map
 /**
  * Fake implementation of [ConvertedFileDao] for testing.
  * Uses an in-memory list to simulate database operations.
+ *
+ * Note: This fake is NOT thread-safe and is designed for single-threaded
+ * unit tests using StandardTestDispatcher. For multi-threaded test scenarios,
+ * use a thread-safe implementation or proper synchronization.
  */
 class FakeConvertedFileDao : ConvertedFileDao {
     private val files = mutableListOf<ConvertedFileEntity>()
