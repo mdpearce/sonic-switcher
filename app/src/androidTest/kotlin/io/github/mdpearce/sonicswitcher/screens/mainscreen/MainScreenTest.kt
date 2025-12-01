@@ -10,12 +10,12 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import io.github.mdpearce.sonicswitcher.converter.results.Inactive
-import io.github.mdpearce.sonicswitcher.converter.results.Processing
 import io.github.mdpearce.sonicswitcher.data.ConvertedFile
 import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import io.github.mdpearce.sonicswitcher.converter.results.Processing as ProgressProcessing
 
 /**
  * UI tests for MainScreen composable.
@@ -194,9 +194,7 @@ class MainScreenTest {
                 onAddToQueueClicked = {},
                 onShareAllQueuedClicked = {},
                 onClearQueueClicked = {},
-                screenState =
-                    io.github.mdpearce.sonicswitcher.screens.mainscreen
-                        .Processing(Inactive),
+                screenState = Processing(Inactive),
                 queuedFiles = emptyList(),
                 queueCount = 0,
             )
@@ -219,10 +217,7 @@ class MainScreenTest {
                 onAddToQueueClicked = {},
                 onShareAllQueuedClicked = {},
                 onClearQueueClicked = {},
-                screenState =
-                    io.github.mdpearce.sonicswitcher.screens.mainscreen.Processing(
-                        Processing(0.5f),
-                    ),
+                screenState = Processing(ProgressProcessing(0.5f)),
                 queuedFiles = emptyList(),
                 queueCount = 0,
             )
