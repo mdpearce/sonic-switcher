@@ -4,6 +4,48 @@
 
 This project uses **GitHub Actions** for continuous integration on pull requests. The CI/CD pipeline is optimized for cost (free public runners) and speed (aggressive caching).
 
+## Initial Setup
+
+### Required GitHub Secrets
+
+Before the workflow can run, you need to configure the following secrets in your GitHub repository:
+
+**Go to**: `Settings → Secrets and variables → Actions → New repository secret`
+
+#### 1. `GOOGLE_SERVICES_JSON`
+
+The Firebase configuration file content. For CI/CD, you can use a minimal dummy config since unit tests don't need actual Firebase services.
+
+**Option A: Generate minimal config (recommended for CI)**
+```bash
+# Run the helper script
+./scripts/generate-ci-firebase-config.sh
+
+# Copy the generated JSON
+cat google-services-ci-template.json | pbcopy  # macOS
+cat google-services-ci-template.json | xclip   # Linux
+```
+
+**Option B: Use your real google-services.json (if you want Firebase to work in CI)**
+```bash
+cat app/google-services.json | pbcopy
+```
+
+Then:
+1. Go to [Repository Secrets](https://github.com/mdpearce/sonic-switcher/settings/secrets/actions)
+2. Click "New repository secret"
+3. Name: `GOOGLE_SERVICES_JSON`
+4. Value: Paste the JSON content
+5. Click "Add secret"
+
+**⚠️ Important Notes:**
+- This should be valid JSON (the entire file content)
+- For CI, a dummy config is fine since tests don't need Firebase
+- For production/release workflows, use your real Firebase config
+- Never commit `google-services.json` to the repository
+
+---
+
 ## Workflow: PR Checks
 
 **File**: `.github/workflows/pr-checks.yml`
@@ -136,12 +178,30 @@ Test reports and coverage reports are uploaded as artifacts and retained for **7
 
 ## Firebase Configuration for CI
 
-The workflow creates a **dummy `google-services.json`** file because:
-- Firebase is not needed for unit tests
-- Keeps the real file secret (not committed to repo)
-- Prevents build failures when Google Services plugin runs
+The workflow uses GitHub Secrets to inject the Firebase configuration at build time:
 
-**Not a security risk**: The dummy file has fake API keys and project IDs.
+```yaml
+- name: Create google-services.json from secrets
+  run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
+```
+
+**Why use secrets?**
+- ✅ Keeps sensitive data out of repository
+- ✅ Different configs for CI vs production
+- ✅ Easy to update without code changes
+- ✅ Standard security practice
+
+**What gets injected:**
+- `google-services.json` file in the `app/` directory
+- Created fresh for each workflow run
+- Deleted automatically when workflow completes
+
+**For unit tests:** A minimal/dummy Firebase config works fine since:
+- Tests don't make actual Firebase API calls
+- The Google Services plugin just needs valid JSON structure
+- Analytics and Crashlytics are not initialized in tests
+
+---
 
 ## Local Validation
 
