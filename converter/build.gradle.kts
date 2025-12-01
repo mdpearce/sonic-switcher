@@ -35,6 +35,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 kotlin {
@@ -50,7 +56,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.ffmpeg.kit.audio)
     api(libs.kotlin.result)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.truth)
 }
