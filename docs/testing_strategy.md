@@ -666,58 +666,57 @@ class TestClock(private var instant: Instant = Instant.EPOCH) : Clock() {
 
 ### GitHub Actions Workflow
 
-```yaml
-name: CI Tests
+See `.github/workflows/pr-checks.yml` for the full implementation.
 
-on: [push, pull_request]
+**Overview:**
+```yaml
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew ktlintCheck
+
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-      - name: Run unit tests
-        run: ./gradlew test --stacktrace
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: test-reports
-          path: |
-            app/build/reports/tests/
-            converter/build/reports/tests/
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew test --continue
 
-  instrumentation-tests:
-    runs-on: macOS-latest
+  coverage:
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew koverXmlReport koverHtmlReport
+      - uses: madrapps/jacoco-report@v1.7.1  # Works with Kover XML
         with:
-          java-version: '17'
-      - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          script: ./gradlew connectedCheck
-      - name: Upload instrumentation reports
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: instrumentation-reports
-          path: app/build/reports/androidTests/
+          paths: build/reports/kover/report.xml
+          min-coverage-overall: 60
 
-  lint:
+  pr-check-summary:
+    needs: [lint, unit-tests, coverage]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck
+      - run: echo "All checks passed!"
 ```
+
+**Note**: Instrumentation tests are not run in PR workflow to keep costs free/low. They can be added to a separate workflow that runs on-demand or for release branches.
 
 ---
 
@@ -745,10 +744,71 @@ jobs:
 - [ ] Accessibility tests
 - [ ] Screenshot tests (optional)
 
-### Phase 5: CI/CD (Week 6)
-- [ ] GitHub Actions workflow
-- [ ] Coverage reports (JaCoCo)
-- [ ] PR gates (tests must pass)
+### Phase 5: CI/CD (Week 6) ✅
+- [x] GitHub Actions workflow for PR checks
+- [x] Kover coverage reporting (Kotlin-native)
+- [x] PR gates (lint + tests must pass)
+- [x] Automated coverage comments on PRs
+
+**Status**: ✅ **IMPLEMENTED**
+
+#### GitHub Actions Workflow
+
+The project uses GitHub Actions for automated PR validation. The workflow includes:
+
+**Jobs:**
+1. **Lint Check** - Runs `ktlintCheck` on all modules
+2. **Unit Tests** - Executes all unit tests (`./gradlew test`)
+3. **Coverage** - Generates Kover reports and posts coverage to PR comments
+4. **PR Check Summary** - Consolidates all check results
+
+**Features:**
+- Free public runners (ubuntu-latest)
+- Gradle dependency caching for faster builds
+- Artifact uploads (test reports, coverage reports)
+- Concurrent run cancellation (saves resources)
+- Dummy `google-services.json` for CI (Firebase not needed for tests)
+
+**Required Check**: Set `PR Check Summary` as a required status check in GitHub branch protection rules
+
+#### Kover Configuration
+
+Uses **Kover 0.9.0** (modern Kotlin-native coverage tool) instead of JaCoCo:
+- Multi-module aggregated reporting (`:app` + `:converter`)
+- Excludes generated code (Hilt, R classes, BuildConfig, etc.)
+- Generates XML (for CI) and HTML (for human viewing) reports
+- Minimum coverage threshold: 60% (will increase as tests are added)
+
+**Commands:**
+```bash
+./gradlew test koverXmlReport koverHtmlReport  # Generate all reports
+./gradlew koverLog                              # Print coverage to console
+./gradlew koverVerify                           # Enforce coverage thresholds
+```
+
+**Report Locations:**
+- XML: `build/reports/kover/report.xml`
+- HTML: `build/reports/kover/html/index.html`
+
+#### Local Testing
+
+Validate CI/CD locally before pushing:
+```bash
+# Run all checks (same as CI)
+./gradlew ktlintCheck test koverXmlReport koverHtmlReport
+
+# Quick checks
+./gradlew ktlintCheck    # Lint only
+./gradlew test           # Tests only
+./gradlew koverLog       # Coverage summary
+```
+
+#### Cost Optimization
+
+- Uses public GitHub-hosted runners (free for public repos)
+- Gradle caching reduces build times (30-60% faster after first run)
+- Concurrent run cancellation prevents wasted resources
+- No instrumentation tests in PR workflow (requires emulator, slower)
 
 ---
 
