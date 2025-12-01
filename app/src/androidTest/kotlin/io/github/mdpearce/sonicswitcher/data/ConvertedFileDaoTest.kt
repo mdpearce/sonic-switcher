@@ -199,8 +199,8 @@ class ConvertedFileDaoTest {
             // Assert - ID should continue from previous counter (not reset to 1)
             dao.getAllFiles().test {
                 val files = awaitItem()
-                // SQLite doesn't reset auto-increment on DELETE, so ID continues
-                assertThat(files[0].id).isGreaterThan(1L)
+                // SQLite maintains auto-increment counter after DELETE, so ID should be 2
+                assertThat(files[0].id).isEqualTo(2L)
             }
         }
 
@@ -327,7 +327,7 @@ class ConvertedFileDaoTest {
         }
 
     @Test
-    fun multipleSubscribers_receiveTheSameUpdates() =
+    fun sequentialSubscribers_receiveCurrentStateAndUpdates() =
         runTest {
             // Arrange
             val filesFlow = dao.getAllFiles()

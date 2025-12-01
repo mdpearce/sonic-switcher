@@ -15,6 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,11 +35,28 @@ class FFMpegKitConverterTest {
     private lateinit var converter: FFMpegKitConverter
     private lateinit var cacheDir: File
 
+    companion object {
+        private const val SAMPLE_RATE = 44100
+        private const val NUM_CHANNELS = 1 // Mono
+        private const val BITS_PER_SAMPLE = 16
+        private const val FREQUENCY = 440.0 // A4 note
+    }
+
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         converter = FFMpegKitConverter(context)
         cacheDir = context.cacheDir
+    }
+
+    @After
+    fun tearDown() {
+        // Clean up any remaining test files
+        cacheDir.listFiles()?.forEach { file ->
+            if (file.name.startsWith("test_") || file.name.contains("_output") || file.name == "invalid.txt") {
+                file.delete()
+            }
+        }
     }
 
     @Test
@@ -73,7 +91,7 @@ class FFMpegKitConverterTest {
                 // Verify progress went from 0 to higher values
                 val processingUpdates = progressUpdates.filterIsInstance<Processing>()
                 assertThat(processingUpdates).isNotEmpty()
-                val firstProgress = processingUpdates.first() as Processing
+                val firstProgress = processingUpdates.first()
                 assertThat(firstProgress.complete).isEqualTo(0.0f)
             } finally {
                 // Cleanup
@@ -153,6 +171,8 @@ class FFMpegKitConverterTest {
                     assertThat(result).isEqualTo(ConversionCancelled)
                 }
                 assertThat(progressUpdates).isNotEmpty()
+                // Verify conversion actually started before cancellation
+                assertThat(progressUpdates.filter { it is Processing }).isNotEmpty()
             } finally {
                 // Cleanup
                 inputFile.delete()
@@ -184,16 +204,15 @@ class FFMpegKitConverterTest {
 
                 // All progress values should be between 0.0 and 1.0
                 processingUpdates.forEach { update ->
-                    val processing = update as Processing
                     // FFmpeg can report slightly negative values at the start, so we allow some margin
-                    assertThat(processing.complete).isAtLeast(-0.1f)
+                    assertThat(update.complete).isAtLeast(-0.1f)
                     // Progress can exceed 1.0 slightly due to FFmpeg reporting, so we allow some margin
-                    assertThat(processing.complete).isAtMost(1.5f)
+                    assertThat(update.complete).isAtMost(1.1f)
                 }
 
                 // Progress should generally increase (allowing for some noise)
-                val firstProgress = (processingUpdates.first() as Processing).complete
-                val lastProgress = (processingUpdates.last() as Processing).complete
+                val firstProgress = processingUpdates.first().complete
+                val lastProgress = processingUpdates.last().complete
                 assertThat(lastProgress).isAtLeast(firstProgress)
             } finally {
                 // Cleanup
@@ -222,8 +241,8 @@ class FFMpegKitConverterTest {
                         )
                     }.exceptionOrNull()
 
-                // Should throw some kind of exception (ConversionException or IllegalStateException)
-                assertThat(exception).isNotNull()
+                // Should throw IllegalStateException when file doesn't exist
+                assertThat(exception).isInstanceOf(IllegalStateException::class.java)
             } finally {
                 // Cleanup
                 outputFile.delete()
@@ -232,7 +251,7 @@ class FFMpegKitConverterTest {
 
     /**
      * Creates a simple WAV file for testing.
-     * Generates a basic sine wave audio file.
+     * Generates a 440Hz sine wave (A4 note) audio file.
      *
      * @param filename Name of the file to create
      * @param durationSeconds Duration of audio in seconds (default 1 second)
@@ -245,21 +264,17 @@ class FFMpegKitConverterTest {
         val file = File(cacheDir, filename)
         FileOutputStream(file).use { fos ->
             // WAV file header for PCM audio
-            val sampleRate = 44100
-            val numChannels = 1 // Mono
-            val bitsPerSample = 16
-            val numSamples = sampleRate * durationSeconds
-            val dataSize = numSamples * numChannels * (bitsPerSample / 8)
+            val numSamples = SAMPLE_RATE * durationSeconds
+            val dataSize = numSamples * NUM_CHANNELS * (BITS_PER_SAMPLE / 8)
 
             // Write WAV header
-            writeWavHeader(fos, dataSize, sampleRate, numChannels, bitsPerSample)
+            writeWavHeader(fos, dataSize, SAMPLE_RATE, NUM_CHANNELS, BITS_PER_SAMPLE)
 
-            // Generate simple sine wave audio data (440 Hz - A4 note)
-            val frequency = 440.0
+            // Generate simple sine wave audio data
             val amplitude = 32767 / 2 // Half of 16-bit max to avoid clipping
 
             for (i in 0 until numSamples) {
-                val angle = 2.0 * Math.PI * frequency * i / sampleRate
+                val angle = 2.0 * Math.PI * FREQUENCY * i / SAMPLE_RATE
                 val sample = (amplitude * Math.sin(angle)).toInt().toShort()
 
                 // Write 16-bit PCM sample (little-endian)
