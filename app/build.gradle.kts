@@ -110,8 +110,7 @@ play {
     track.set("internal")
 
     // Release status: completed, draft, halted, inProgress
-    // Using 'draft' for testing - change to 'completed' when ready to auto-publish
-    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT)
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
 }
 
 dependencies {
