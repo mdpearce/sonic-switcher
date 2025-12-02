@@ -16,6 +16,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Permissions needed for test reporting and coverage comments
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   lint:
     name: Lint Check
@@ -36,7 +42,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
-          gradle-home-cache-cleanup: true
+          cache-cleanup: on-success
       
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -75,7 +81,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
-          gradle-home-cache-cleanup: true
+          cache-cleanup: on-success
       
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -128,7 +134,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
-          gradle-home-cache-cleanup: true
+          cache-cleanup: on-success
       
       - name: Make gradlew executable
         run: chmod +x ./gradlew
