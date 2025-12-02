@@ -13,6 +13,7 @@ firebase-crashlytics = "3.0.6"
 ktlint = "14.0.1"
 room = "2.8.4"
 play-publisher = "3.12.2"
+kover = "0.9.0"
 
 # Testing
 turbine = "1.2.1"
@@ -33,6 +34,7 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }

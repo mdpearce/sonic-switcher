@@ -20,3 +20,4 @@ play-store-credentials.json
 
 # Play Store metadata and configuration
 /app/src/main/play/
+google-services-ci-template.json
