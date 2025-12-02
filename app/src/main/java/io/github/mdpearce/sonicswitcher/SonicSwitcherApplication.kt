@@ -9,8 +9,7 @@ class SonicSwitcherApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Enable Crashlytics collection
-        // In debug builds, you might want to disable it: BuildConfig.DEBUG
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+        // Enable Crashlytics only for release builds
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
     }
 }

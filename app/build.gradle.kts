@@ -59,6 +59,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Disable Crashlytics for debug builds
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
