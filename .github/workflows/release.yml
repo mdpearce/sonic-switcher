@@ -46,16 +46,26 @@ jobs:
       - name: Validate required secrets
         shell: bash
         run: |
-          MISSING_SECRETS=()
+          MISSING_SECRETS=""
           
-          [[ -z "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" ]] && MISSING_SECRETS+=("RELEASE_KEYSTORE_BASE64")
-          [[ -z "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" ]] && MISSING_SECRETS+=("RELEASE_KEYSTORE_PASSWORD")
-          [[ -z "${{ secrets.RELEASE_KEY_ALIAS }}" ]] && MISSING_SECRETS+=("RELEASE_KEY_ALIAS")
-          [[ -z "${{ secrets.RELEASE_KEY_PASSWORD }}" ]] && MISSING_SECRETS+=("RELEASE_KEY_PASSWORD")
-          [[ -z "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" ]] && MISSING_SECRETS+=("PLAY_STORE_SERVICE_ACCOUNT_JSON")
+          if [ -z "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS RELEASE_KEYSTORE_BASE64"
+          fi
+          if [ -z "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS RELEASE_KEYSTORE_PASSWORD"
+          fi
+          if [ -z "${{ secrets.RELEASE_KEY_ALIAS }}" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS RELEASE_KEY_ALIAS"
+          fi
+          if [ -z "${{ secrets.RELEASE_KEY_PASSWORD }}" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS RELEASE_KEY_PASSWORD"
+          fi
+          if [ -z "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS PLAY_STORE_SERVICE_ACCOUNT_JSON"
+          fi
           
-          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
-            echo "❌ Missing required secrets: ${MISSING_SECRETS[*]}"
+          if [ -n "$MISSING_SECRETS" ]; then
+            echo "❌ Missing required secrets:$MISSING_SECRETS"
             echo "Please configure these secrets in GitHub Settings -> Secrets and variables -> Actions"
             echo "See docs/github_secrets_setup.md for details"
             exit 1
