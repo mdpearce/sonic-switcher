@@ -61,11 +61,14 @@ android {
     buildTypes {
         debug {
             // Disable Crashlytics for debug builds
+            manifestPlaceholders["crashlyticsEnabled"] = false
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
         }
         release {
+            // Enable Crashlytics for release builds
+            manifestPlaceholders["crashlyticsEnabled"] = true
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
