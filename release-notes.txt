@@ -1,0 +1,25 @@
+Release 0.0.1-SNAPSHOT (Build 14)
+
+What's New:
+- Simplify secrets validation to use POSIX-compatible syntax
+- Remove unused PLAY_STORE_JSON_KEY environment variable
+- Fix secrets validation to use bash shell
+- Update versionCode to 13
+- Add automated release workflow for Play Store deployment (#19)
+- Add CI/CD pipeline with GitHub Actions and Kover coverage (#18)
+- Phase 4: Add Compose UI tests for MainScreen (#17)
+- Add Phase 3 Integration Tests (DAO and FFmpeg Converter) (#16)
+- Update kotlin (#15)
+- feat: Add Phase 2 Core Business Logic Tests (#14)
+- Phase 1: Testing Infrastructure & ViewModel Test Suite (#13)
+- Exclude Play Store metadata from version control (#12)
+- Add Play Store publishing configuration (#11)
+- Add app icon 512px variant and screenshots
+- Update app icon and color scheme (#10)
+- Add keystore signing configuration for release builds (#9)
+- Add comprehensive ProGuard/R8 rules for release builds (#8)
+- Migrate application ID
+- Migrate license from Apache 2.0 to MPL-2.0 (#7)
+- Add conversion queue feature (#6)
+
+Generated from commits since last release.
