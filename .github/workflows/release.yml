@@ -44,6 +44,7 @@ jobs:
           cache-cleanup: on-success
       
       - name: Validate required secrets
+        shell: bash
         run: |
           MISSING_SECRETS=()
           
