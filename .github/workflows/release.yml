@@ -148,8 +148,6 @@ jobs:
           ./gradlew publishBundle \
             --track=${{ inputs.track }} \
             --stacktrace
-        env:
-          PLAY_STORE_JSON_KEY: ${{ github.workspace }}/app/play-store-credentials.json
       
       - name: Create release tag
         run: |
