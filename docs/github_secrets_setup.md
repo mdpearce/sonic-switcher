@@ -74,9 +74,11 @@ These are not currently needed but may be added for future workflows:
 
 ```bash
 # Encode your existing keystore to base64
-base64 -i /path/to/your-upload-key.jks | pbcopy  # macOS
-base64 -w 0 /path/to/your-upload-key.jks | xclip  # Linux
+cat /path/to/your-upload-key.jks | base64 | pbcopy  # macOS
+cat /path/to/your-upload-key.jks | base64 -w 0 | xclip -selection clipboard  # Linux
 ```
+
+**Note**: `pbcopy` (macOS) and `xclip` (Linux) are clipboard utilities. On Linux, install `xclip` via your package manager if not already installed (`sudo apt install xclip` or `sudo yum install xclip`).
 
 #### Step 2: Add to GitHub
 

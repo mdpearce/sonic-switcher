@@ -158,7 +158,7 @@ base64 -i your-upload-key.jks | pbcopy
 **Problem**: Signing configuration error
 
 **Solution**:
-- Verify all 4 release secrets are set correctly
+- Verify all 5 release secrets are set correctly
 - Check keystore alias matches your actual keystore
 - Ensure passwords are correct
 
