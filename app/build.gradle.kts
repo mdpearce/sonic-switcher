@@ -59,7 +59,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Disable Crashlytics for debug builds
+            manifestPlaceholders["crashlyticsEnabled"] = false
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+        }
         release {
+            // Enable Crashlytics for release builds
+            manifestPlaceholders["crashlyticsEnabled"] = true
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -74,6 +83,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -110,8 +120,7 @@ play {
     track.set("internal")
 
     // Release status: completed, draft, halted, inProgress
-    // Using 'draft' for testing - change to 'completed' when ready to auto-publish
-    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT)
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
 }
 
 dependencies {

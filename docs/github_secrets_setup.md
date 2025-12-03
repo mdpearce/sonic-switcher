@@ -62,21 +62,102 @@ The secret should appear in your secrets list (the value will be hidden).
 
 These are not currently needed but may be added for future workflows:
 
-### RELEASE_KEYSTORE
+### RELEASE_KEYSTORE_BASE64
 
-**Purpose**: Android app signing keystore for release builds
+**Purpose**: Android app signing keystore (upload key) encoded as base64
 
-**When needed**: Only for release/production builds (not PR checks)
+**When needed**: Release workflow for building signed bundles
 
-**Setup**: Will be documented when release workflow is implemented
+**How to set up**:
 
-### PLAY_STORE_SERVICE_ACCOUNT
+#### Step 1: Encode your keystore
+
+```bash
+# Encode your existing keystore to base64
+cat /path/to/your-upload-key.jks | base64 | pbcopy  # macOS
+cat /path/to/your-upload-key.jks | base64 -w 0 | xclip -selection clipboard  # Linux
+```
+
+**Note**: `pbcopy` (macOS) and `xclip` (Linux) are clipboard utilities. On Linux, install `xclip` via your package manager if not already installed (`sudo apt install xclip` or `sudo yum install xclip`).
+
+#### Step 2: Add to GitHub
+
+1. Go to: **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"**
+3. Name: `RELEASE_KEYSTORE_BASE64`
+4. Value: Paste the base64 string
+5. Click **"Add secret"**
+
+### RELEASE_KEYSTORE_PASSWORD
+
+**Purpose**: Password for the release keystore
+
+**When needed**: Release workflow
+
+**Setup**:
+1. Name: `RELEASE_KEYSTORE_PASSWORD`
+2. Value: Your keystore password
+
+### RELEASE_KEY_ALIAS
+
+**Purpose**: Alias of the key in the keystore
+
+**When needed**: Release workflow
+
+**Setup**:
+1. Name: `RELEASE_KEY_ALIAS`
+2. Value: Your key alias (e.g., `upload`)
+
+### RELEASE_KEY_PASSWORD
+
+**Purpose**: Password for the specific key
+
+**When needed**: Release workflow
+
+**Setup**:
+1. Name: `RELEASE_KEY_PASSWORD`
+2. Value: Your key password (often same as keystore password)
+
+### PLAY_STORE_SERVICE_ACCOUNT_JSON
 
 **Purpose**: Google Play Console API access for automated publishing
 
-**When needed**: Only for automated Play Store deployments
+**When needed**: Release workflow for Play Store uploads
 
-**Setup**: Will be documented when deployment workflow is implemented
+**How to set up**:
+
+#### Step 1: Create service account
+
+1. Go to [Google Play Console](https://play.google.com/console)
+2. Navigate to: **Setup → API access**
+3. Click **"Create new service account"**
+4. Follow the link to Google Cloud Console
+5. Create a new service account with **"Service Account User"** role
+6. Create a JSON key for the service account
+7. Download the JSON file
+
+#### Step 2: Grant permissions
+
+1. Return to Play Console → API access
+2. Find your service account and click **"Grant access"**
+3. Add to **"Internal testing"** track with **"Release manager"** role
+4. Click **"Apply"**
+
+#### Step 3: Add to GitHub
+
+```bash
+# Copy the JSON file content
+cat /path/to/service-account.json | pbcopy  # macOS
+cat /path/to/service-account.json | xclip   # Linux
+```
+
+1. Go to: **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"**
+3. Name: `PLAY_STORE_SERVICE_ACCOUNT_JSON`
+4. Value: Paste the entire JSON content
+5. Click **"Add secret"**
+
+**Note**: The play-publisher plugin can also use a file, but for CI/CD it's better to use secrets.
 
 ---
 
