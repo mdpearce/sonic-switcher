@@ -92,7 +92,7 @@ jobs:
         run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
 
       - name: Run tests
-        run: ./gradlew test--parallel --build-cache --continue
+        run: ./gradlew test --parallel --build-cache --continue
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
