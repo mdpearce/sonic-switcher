@@ -95,7 +95,7 @@ fun MainScreen(
                     val intent =
                         Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                             addCategory(Intent.CATEGORY_OPENABLE)
-                            type = "audio/mpeg"
+                            type = "audio/wave"
                             putExtra(Intent.EXTRA_TITLE, event.defaultFilename)
                         }
                     outputFileChooser.launch(intent)
@@ -105,7 +105,7 @@ fun MainScreen(
                     val intent =
                         Intent(Intent.ACTION_SEND).apply {
                             putExtra(Intent.EXTRA_STREAM, event.uri)
-                            type = "audio/mpeg"
+                            type = "audio/wave"
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
                     context.startActivity(Intent.createChooser(intent, null))
@@ -115,7 +115,7 @@ fun MainScreen(
                     val intent =
                         Intent(Intent.ACTION_SEND_MULTIPLE).apply {
                             putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(event.uris))
-                            type = "audio/mpeg"
+                            type = "audio/wave"
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
                     context.startActivity(Intent.createChooser(intent, null))

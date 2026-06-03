@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.mdpearce.sonicswitcher.converter.AudioFileConverter
-import io.github.mdpearce.sonicswitcher.converter.FFMpegKitConverter
+import io.github.mdpearce.sonicswitcher.converter.WavNativeConverter
 import javax.inject.Singleton
 
 @Module
@@ -21,5 +21,5 @@ class ConverterModule {
     @Provides
     fun provideAudioFileConverter(
         @ApplicationContext context: Context,
-    ): AudioFileConverter = FFMpegKitConverter(context)
+    ): AudioFileConverter = WavNativeConverter(context)
 }

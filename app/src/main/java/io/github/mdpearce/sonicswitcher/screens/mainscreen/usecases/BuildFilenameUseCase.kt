@@ -13,5 +13,5 @@ class BuildFilenameUseCase
         private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd (H:mm:ss)")
 
         operator fun invoke(): String =
-            "Switched ${formatter.format(clock.instant().atZone(ZoneId.systemDefault()))}.mp3"
+            "Switched ${formatter.format(clock.instant().atZone(ZoneId.systemDefault()))}.wav"
     }
