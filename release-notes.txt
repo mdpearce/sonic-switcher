@@ -1,6 +1,7 @@
-Release 0.0.1-SNAPSHOT (Build 15)
+Release 0.0.1-SNAPSHOT (Build 16)
 
 What's New:
-- Bump version code to 14
+- Switch to WAV file conversion (#21)
+- chore: Bump versionCode to 15 (#20)
 
 Generated from commits since last release.
