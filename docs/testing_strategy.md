@@ -4,7 +4,7 @@
 
 This document outlines a comprehensive testing strategy for Sonic Switcher, covering unit tests, integration tests, and UI instrumentation tests. The approach prioritizes simplicity, effectiveness, and modern Android testing best practices.
 
-**Current State**: No tests exist  
+**Current State**: No tests exist
 **Goal**: Achieve >80% code coverage with a pragmatic, maintainable test suite
 
 ---
@@ -102,7 +102,7 @@ converter/src/
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainScreenViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    
+
     private lateinit var audioFileConverter: AudioFileConverter
     private lateinit var repository: ConvertedFileRepository
     private lateinit var viewModel: MainScreenViewModel
@@ -110,11 +110,11 @@ class MainScreenViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
+
         audioFileConverter = mockk()
         repository = mockk(relaxed = true)
         // ... mock other dependencies
-        
+
         viewModel = MainScreenViewModel(...)
     }
 
@@ -696,21 +696,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew test --continue
 
-  coverage:
-    runs-on: ubuntu-latest
-    needs: [unit-tests]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-      - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew koverXmlReport koverHtmlReport
-      - uses: madrapps/jacoco-report@v1.7.1  # Works with Kover XML
-        with:
-          paths: build/reports/kover/report.xml
-          min-coverage-overall: 60
-
   pr-check-summary:
-    needs: [lint, unit-tests, coverage]
+    needs: [lint, unit-tests]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed!"
@@ -746,9 +733,7 @@ jobs:
 
 ### Phase 5: CI/CD (Week 6) ✅
 - [x] GitHub Actions workflow for PR checks
-- [x] Kover coverage reporting (Kotlin-native)
 - [x] PR gates (lint + tests must pass)
-- [x] Automated coverage comments on PRs
 
 **Status**: ✅ **IMPLEMENTED**
 
@@ -759,8 +744,7 @@ The project uses GitHub Actions for automated PR validation. The workflow includ
 **Jobs:**
 1. **Lint Check** - Runs `ktlintCheck` on all modules
 2. **Unit Tests** - Executes all unit tests (`./gradlew test`)
-3. **Coverage** - Generates Kover reports and posts coverage to PR comments
-4. **PR Check Summary** - Consolidates all check results
+3. **PR Check Summary** - Consolidates all check results
 
 **Features:**
 - Free public runners (ubuntu-latest)
@@ -771,36 +755,16 @@ The project uses GitHub Actions for automated PR validation. The workflow includ
 
 **Required Check**: Set `PR Check Summary` as a required status check in GitHub branch protection rules
 
-#### Kover Configuration
-
-Uses **Kover 0.9.0** (modern Kotlin-native coverage tool) instead of JaCoCo:
-- Multi-module aggregated reporting (`:app` + `:converter`)
-- Excludes generated code (Hilt, R classes, BuildConfig, etc.)
-- Generates XML (for CI) and HTML (for human viewing) reports
-- Minimum coverage threshold: 60% (will increase as tests are added)
-
-**Commands:**
-```bash
-./gradlew test koverXmlReport koverHtmlReport  # Generate all reports
-./gradlew koverLog                              # Print coverage to console
-./gradlew koverVerify                           # Enforce coverage thresholds
-```
-
-**Report Locations:**
-- XML: `build/reports/kover/report.xml`
-- HTML: `build/reports/kover/html/index.html`
-
 #### Local Testing
 
 Validate CI/CD locally before pushing:
 ```bash
 # Run all checks (same as CI)
-./gradlew ktlintCheck test koverXmlReport koverHtmlReport
+./gradlew ktlintCheck test
 
 # Quick checks
 ./gradlew ktlintCheck    # Lint only
 ./gradlew test           # Tests only
-./gradlew koverLog       # Coverage summary
 ```
 
 #### Cost Optimization
@@ -849,7 +813,7 @@ Validate CI/CD locally before pushing:
    ```kotlin
    // ❌ Hard to test
    val result = flow.first()
-   
+
    // ✅ Turbine makes it readable
    flow.test {
        assertThat(awaitItem()).isEqualTo(expected)
@@ -871,7 +835,7 @@ Validate CI/CD locally before pushing:
    every { dep1.foo() } returns bar
    every { dep2.baz() } returns qux
    // ... 10 more lines
-   
+
    // ✅ Use a fake
    val fakeDep = FakeDependency()
    ```

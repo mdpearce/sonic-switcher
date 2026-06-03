@@ -54,7 +54,6 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.ffmpeg.kit.audio)
     api(libs.kotlin.result)
 
     // Testing
