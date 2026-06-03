@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.play.publisher)
-    alias(libs.plugins.kover)
 }
 
 // Load keystore properties from local.properties
