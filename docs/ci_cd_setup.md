@@ -64,15 +64,7 @@ Then:
 - Continues testing all modules even if one fails
 - Uploads test reports and results as artifacts
 
-### 3. Coverage
-- Generates Kover coverage reports (XML + HTML)
-- Posts coverage summary as PR comment
-- Enforces minimum coverage thresholds:
-  - Overall: 60%
-  - Changed files: 70%
-- Only runs if unit tests pass
-
-### 4. PR Check Summary
+### 3. PR Check Summary
 - Consolidates all job results
 - Single required status check for branch protection
 - Fails if any upstream job fails
@@ -86,39 +78,6 @@ Then:
   - Required check: `PR Check Summary`
 - ✅ Require branches to be up to date before merging
 - ⬜ Do not require reviews for testing purposes (or enable for production)
-
-## Coverage Reporting
-
-### Kover (Kotlin Coverage)
-
-**Why Kover over JaCoCo?**
-- Native Kotlin support (better understanding of inline functions, coroutines)
-- Faster instrumentation
-- Modern Gradle plugin with better caching
-- First-class support for multi-module Android projects
-
-**Configuration**: `build.gradle.kts` (root)
-
-**Exclusions**:
-- Generated code (Hilt, Room, KSP, Compose)
-- Android framework (R classes, BuildConfig)
-- Firebase modules
-
-### Local Coverage Reports
-
-```bash
-# Generate all reports
-./gradlew test koverXmlReport koverHtmlReport
-
-# View HTML report
-open build/reports/kover/html/index.html
-
-# Print coverage to console
-./gradlew koverLog
-
-# Verify minimum thresholds
-./gradlew koverVerify
-```
 
 ## Cost Optimization
 
@@ -209,12 +168,11 @@ The workflow uses GitHub Secrets to inject the Firebase configuration at build t
 
 ```bash
 # Full CI simulation
-./gradlew ktlintCheck test koverXmlReport koverHtmlReport
+./gradlew ktlintCheck test
 
 # Individual checks
 ./gradlew ktlintCheck          # Lint only
 ./gradlew test                 # Tests only
-./gradlew koverLog             # Coverage summary
 ```
 
 ## Future Enhancements
@@ -252,25 +210,6 @@ These can be added later in separate workflows or manual processes.
 
 # View test report
 open app/build/reports/tests/testDebugUnitTest/index.html
-```
-
-### Coverage Failures
-
-If coverage is below threshold:
-
-```bash
-# Check current coverage
-./gradlew koverLog
-
-# See detailed HTML report
-./gradlew koverHtmlReport
-open build/reports/kover/html/index.html
-```
-
-Add tests for uncovered code, then verify:
-
-```bash
-./gradlew test koverVerify
 ```
 
 ## Troubleshooting
@@ -312,5 +251,3 @@ If exceeded, check for:
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Gradle Actions Setup](https://github.com/gradle/actions)
-- [Kover Documentation](https://kotlin.github.io/kotlinx-kover/)
-- [JaCoCo Report Action](https://github.com/madrapps/jacoco-report) (works with Kover XML)

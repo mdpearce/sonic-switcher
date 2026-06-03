@@ -5,6 +5,9 @@ import io.github.mdpearce.sonicswitcher.converter.results.ConversionResult
 import io.github.mdpearce.sonicswitcher.converter.results.ProgressUpdate
 
 interface AudioFileConverter {
+    /**
+     * input may be any media format/container supported by the system
+     */
     suspend fun convertAudioFile(
         input: Uri,
         output: Uri,

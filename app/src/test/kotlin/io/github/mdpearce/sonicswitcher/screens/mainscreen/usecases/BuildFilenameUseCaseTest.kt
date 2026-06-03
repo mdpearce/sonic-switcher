@@ -27,14 +27,14 @@ class BuildFilenameUseCaseTest {
         val result = useCase()
 
         // Assert
-        // Format: "Switched yyyy-MM-dd (H:mm:ss).mp3"
+        // Format: "Switched yyyy-MM-dd (H:mm:ss).wav"
         // Date will be in system timezone, so check for structure rather than specific date
         assertThat(result).startsWith("Switched ")
         assertThat(result).contains("2024-")
         assertThat(result).contains("(")
         assertThat(result).contains(":")
         assertThat(result).contains(")")
-        assertThat(result).endsWith(".mp3")
+        assertThat(result).endsWith(".wav")
     }
 
     @Test
@@ -46,7 +46,7 @@ class BuildFilenameUseCaseTest {
         val result = useCase()
 
         // Assert
-        assertThat(result.matches(Regex("Switched \\d{4}-\\d{2}-\\d{2} \\(\\d{1,2}:\\d{2}:\\d{2}\\)\\.mp3"))).isTrue()
+        assertThat(result.matches(Regex("Switched \\d{4}-\\d{2}-\\d{2} \\(\\d{1,2}:\\d{2}:\\d{2}\\)\\.wav"))).isTrue()
     }
 
     @Test
@@ -75,7 +75,7 @@ class BuildFilenameUseCaseTest {
         // Format should handle midnight correctly with single-digit hour
         val expectedDate = instant.atZone(ZoneId.systemDefault()).toLocalDate().toString()
         assertThat(result).contains(expectedDate)
-        assertThat(result.matches(Regex("Switched \\d{4}-\\d{2}-\\d{2} \\(\\d{1,2}:\\d{2}:\\d{2}\\)\\.mp3"))).isTrue()
+        assertThat(result.matches(Regex("Switched \\d{4}-\\d{2}-\\d{2} \\(\\d{1,2}:\\d{2}:\\d{2}\\)\\.wav"))).isTrue()
     }
 
     @Test
@@ -91,7 +91,7 @@ class BuildFilenameUseCaseTest {
         val expectedDate = instant.atZone(ZoneId.systemDefault()).toLocalDate().toString()
         assertThat(result).contains(expectedDate)
         // Time portion will vary based on system timezone
-        assertThat(result).endsWith(".mp3")
+        assertThat(result).endsWith(".wav")
     }
 
     @Test

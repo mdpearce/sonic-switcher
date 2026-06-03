@@ -1,13 +1,13 @@
 # Sonic Switcher
 
-Sonic Switcher is a simple audio converter for Android, designed to convert various audio file formats into high-quality MP3s. Once converted, you can save the files to your device or easily share them using Android's native sharing capabilities.
+Sonic Switcher is a simple audio converter for Android, designed to convert various audio file formats into uncompressed WAV files. Once converted, you can save the files to your device or easily share them using Android's native sharing capabilities.
 
 ## Features
 
 *   Select any audio file from your device's storage.
-*   Convert audio files to MP3 format.
+*   Convert audio files to WAV format.
 *   View the progress of the conversion in real-time.
-*   Save the converted MP3 to your device.
+*   Save the converted WAV to your device.
 *   Share the converted file with other apps.
 
 ## Project Architecture and Structure
@@ -16,7 +16,7 @@ This project is intended to follow modern Android development practices and main
 
 *   **Modular Design**: The project is split into two main modules:
     *   `:app`: This is the main application module, containing the user interface (UI) and all application-level logic. It is responsible for handling user interactions, permissions, and coordinating with the `:converter` module.
-    *   `:converter`: This is a library module that contains the core audio conversion logic. It uses `FFmpegKit` to handle the heavy lifting of audio transcoding. This module is self-contained and has no dependencies on the `:app` module, making it reusable.
+    *   `:converter`: This is a library module that contains the core audio conversion logic. It uses native media APIs to handle the heavy lifting of audio transcoding. This module is self-contained and has no dependencies on the `:app` module, making it reusable.
 
 *   **UI**: The user interface is built entirely with **Jetpack Compose**, Google's modern toolkit for building native Android UI.
 

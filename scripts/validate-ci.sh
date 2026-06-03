@@ -18,17 +18,5 @@ echo "🧪 Step 2: Running unit tests..."
 echo "✅ Unit tests passed"
 echo ""
 
-echo "📊 Step 3: Generating coverage reports..."
-./gradlew koverXmlReport koverHtmlReport
-echo "✅ Coverage reports generated"
-echo ""
-
-echo "📈 Coverage Summary:"
-./gradlew koverLog | grep -A 20 "Coverage summary"
-echo ""
-
 echo "✨ All checks passed! Your PR is ready."
 echo ""
-echo "View coverage report:"
-echo "  HTML: build/reports/kover/html/index.html"
-echo "  XML:  build/reports/kover/report.xml"
